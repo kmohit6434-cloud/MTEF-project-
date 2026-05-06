@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTEF Agent Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #050b14; color: #ffffff; overflow-x: hidden; }
+        .glass-effect { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
+        .nav-active { color: #F59E0B; font-weight: bold; transform: scale(1.1); transition: 0.3s; text-shadow: 0 0 10px rgba(245,158,11,0.5); }
+        .nav-inactive { color: #6b7280; transition: 0.3s; }
+    </style>
+</head>
+<body class="p-4 pb-24 max-w-md mx-auto">
+    
+    <div class="flex justify-between items-center mb-8 pt-2">
+        <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 rounded-full border-2 border-amber-500 flex items-center justify-center bg-amber-500/20 text-amber-500 text-xl font-bold shadow-[0_0_15px_rgba(245,158,11,0.3)]">AG</div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Agent Portal</h1>
+                <p class="text-[10px] text-amber-400 uppercase tracking-widest mt-1">MTEF Network Partner</p>
+            </div>
+        </div>
+        <button onclick="window.location.href='/'" class="text-gray-500 hover:text-red-500 text-xl transition"><i class="fas fa-power-off"></i></button>
+    </div>
+
+    <div id="tabDashboard" class="block">
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="glass-effect p-5 rounded-3xl border-t-2 border-green-500 shadow-lg">
+                <p class="text-[10px] text-gray-400 uppercase mb-1">Total Earnings</p>
+                <h2 class="text-2xl font-bold text-green-400">₹0</h2>
+            </div>
+            <div class="glass-effect p-5 rounded-3xl border-t-2 border-blue-500 shadow-lg">
+                <p class="text-[10px] text-gray-400 uppercase mb-1">My Leads</p>
+                <h2 class="text-2xl font-bold text-blue-400">0</h2>
+            </div>
+        </div>
+        <div class="glass-effect p-6 rounded-3xl text-center">
+            <i class="fas fa-chart-line text-4xl text-gray-600 mb-3"></i>
+            <h3 class="text-sm font-bold text-gray-300">Start Adding Leads</h3>
+            <p class="text-[10px] text-gray-500 mt-2">Go to the Leads tab to register a new client for MTEF.</p>
+        </div>
+    </div>
+
+    <div id="tabLeads" class="hidden">
+        <h3 class="text-sm font-bold text-white mb-4 uppercase tracking-widest border-b-2 border-blue-500 pb-1"><i class="fas fa-user-plus mr-2 text-blue-500"></i> Register New Lead</h3>
+        <div class="glass-effect p-6 rounded-3xl space-y-4">
+            <div><label class="text-[10px] text-gray-400 uppercase">Client Name</label><input type="text" id="clientName" class="w-full bg-[#0a0f1e] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-blue-500"></div>
+            <div><label class="text-[10px] text-gray-400 uppercase">WhatsApp Number</label><input type="tel" id="clientPhone" class="w-full bg-[#0a0f1e] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-blue-500"></div>
+            <div><label class="text-[10px] text-gray-400 uppercase">Required Service</label>
+                <select id="clientService" class="w-full bg-[#0a0f1e] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-blue-500">
+                    <option>Website Development</option><option>App Development</option><option>Graphic Design</option><option>Other Service</option>
+                </select>
+            </div>
+            <button onclick="addClient()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg mt-2 transition">Submit Lead</button>
+        </div>
+    </div>
+
+    <div id="tabWallet" class="hidden">
+        <h3 class="text-sm font-bold text-white mb-4 uppercase tracking-widest border-b-2 border-green-500 pb-1"><i class="fas fa-wallet mr-2 text-green-500"></i> Withdraw Funds</h3>
+        <div class="glass-effect p-6 rounded-3xl space-y-4 border border-green-500/20">
+            <div><label class="text-[10px] text-gray-400 uppercase">Withdrawal Amount (₹)</label><input type="number" id="wAmount" placeholder="Min ₹500" class="w-full bg-[#0a0f1e] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-green-500"></div>
+            <div><label class="text-[10px] text-gray-400 uppercase">Your UPI ID</label><input type="text" id="wUpi" placeholder="e.g. yourname@upi" class="w-full bg-[#0a0f1e] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-green-500"></div>
+            <p class="text-[10px] text-gray-500 text-center mb-2">Payouts are processed within 24 hours.</p>
+            <button onclick="requestWithdraw()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg transition">Request Payout</button>
+        </div>
+    </div>
+
+    <div id="tabSupport" class="hidden">
+        <h3 class="text-sm font-bold text-amber-400 mb-4 uppercase tracking-widest border-b-2 border-amber-500 pb-1"><i class="fas fa-headset mr-2"></i> Agent Support & Rules</h3>
+        
+        <div class="glass-effect p-6 rounded-3xl space-y-5">
+            <div class="flex items-start space-x-3"><div class="w-8 h-8 rounded-full bg-green-500/20 flex-shrink-0 flex items-center justify-center text-green-400 border border-green-500/50"><i class="fas fa-rupee-sign text-sm"></i></div><div><h4 class="text-sm font-bold text-white">Payout Rules</h4><p class="text-[10px] text-gray-400 mt-1">Minimum withdrawal limit ₹500 hai. Payout Request bhejne ke 24 ghante ke andar admin dwara payment clear kiya jayega.</p></div></div>
+            <div class="flex items-start space-x-3 pt-3 border-t border-gray-700/50"><div class="w-8 h-8 rounded-full bg-blue-500/20 flex-shrink-0 flex items-center justify-center text-blue-400 border border-blue-500/50"><i class="fas fa-users text-sm"></i></div><div><h4 class="text-sm font-bold text-white">Lead Verification</h4><p class="text-[10px] text-gray-400 mt-1">Aapki add ki gayi sari leads Admin dwara verify ki jayengi. Fake leads daalne par account block ho sakta hai.</p></div></div>
+        </div>
+
+        <div class="bg-blue-600/10 border border-blue-500/20 p-5 rounded-3xl mt-6 flex flex-col items-center text-center">
+            <h4 class="text-sm font-bold mb-1">Direct Admin Support</h4>
+            <p class="text-[10px] text-gray-400 mb-4">Koi bhi problem aaye ya payout me issue ho, direct Mohit Sir (Admin) ko WhatsApp karein.</p>
+            <button onclick="window.open('https://wa.me/918000130580?text=Hello%20Mohit%20Sir,%20I%20am%20an%20MTEF%20Agent.%20Mujhe%20support%20chahiye.', '_blank')" class="w-full bg-gradient-to-r from-[#25D366] to-[#1ebd5a] hover:from-[#1ebd5a] hover:to-[#1da851] text-white font-bold py-4 rounded-xl shadow-lg transition active:scale-95 flex justify-center items-center text-lg">
+                <i class="fab fa-whatsapp text-2xl mr-2"></i> Message Admin
+            </button>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 w-full glass-effect border-t border-gray-700/50 p-4 flex justify-around items-center z-50 bg-[#050b14]/95 pb-6">
+        <div id="navDashboard" onclick="switchTab('Dashboard')" class="flex flex-col items-center nav-active cursor-pointer"><i class="fas fa-home text-xl mb-1"></i><span class="text-[10px]">Home</span></div>
+        <div id="navLeads" onclick="switchTab('Leads')" class="flex flex-col items-center nav-inactive cursor-pointer"><i class="fas fa-users text-xl mb-1"></i><span class="text-[10px]">Leads</span></div>
+        <div id="navWallet" onclick="switchTab('Wallet')" class="flex flex-col items-center nav-inactive cursor-pointer"><i class="fas fa-wallet text-xl mb-1"></i><span class="text-[10px]">Wallet</span></div>
+        <div id="navSupport" onclick="switchTab('Support')" class="flex flex-col items-center nav-inactive cursor-pointer"><i class="fas fa-headset text-xl mb-1"></i><span class="text-[10px]">Support</span></div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            ['Dashboard', 'Leads', 'Wallet', 'Support'].forEach(t => {
+                document.getElementById('tab' + t).style.display = 'none';
+                document.getElementById('nav' + t).className = 'flex flex-col items-center nav-inactive cursor-pointer';
+            });
+            document.getElementById('tab' + tab).style.display = 'block';
+            document.getElementById('nav' + tab).className = 'flex flex-col items-center nav-active cursor-pointer';
+        }
+
+        async function addClient() {
+            const name = document.getElementById('clientName').value;
+            const phone = document.getElementById('clientPhone').value;
+            const service = document.getElementById('clientService').value;
+            if(!name || !phone) return alert('Kripya puri details bharein!');
+            
+            await fetch('/api/add-client', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name, phone, service }) });
+            alert('✅ Lead Added Successfully!');
+            document.getElementById('clientName').value = ''; document.getElementById('clientPhone').value = '';
+            switchTab('Dashboard');
+        }
+
+        async function requestWithdraw() {
+            const amount = document.getElementById('wAmount').value;
+            const upi = document.getElementById('wUpi').value;
+            if(!amount || !upi) return alert('Kripya Amount aur UPI ID bharein!');
+            
+            await fetch('/api/request-withdrawal', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ agentName: 'MTEF Agent', amount, upi }) });
+            alert('💸 Withdrawal Request Sent to Admin!');
+            document.getElementById('wAmount').value = ''; document.getElementById('wUpi').value = '';
+            switchTab('Dashboard');
+        }
+    </script>
+</body>
+</html>

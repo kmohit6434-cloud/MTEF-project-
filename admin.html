@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTEF Master Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: #f8fafc; overflow: hidden; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s; }
+        .nav-item.active { background: linear-gradient(90deg, rgba(245, 158, 11, 0.2) 0%, transparent 100%); border-left: 4px solid #f59e0b; color: #f59e0b; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex h-screen relative">
+
+    <aside class="w-64 glass-panel h-full flex flex-col shadow-2xl z-20">
+        <div class="h-20 flex items-center px-6 border-b border-slate-700/50">
+            <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center text-slate-900 text-xl font-bold mr-3 shadow-[0_0_15px_rgba(245,158,11,0.5)]"><i class="fas fa-building"></i></div>
+            <div><h1 class="text-xl font-bold text-amber-500 tracking-wider">MTEF</h1><p class="text-[9px] text-slate-400 uppercase tracking-widest">Master Tech Edu</p></div>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            <button onclick="switchTab('dashboard', this)" class="nav-item active w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-300 hover:text-amber-400 transition-colors"><i class="fas fa-home w-6"></i> Dashboard</button>
+            <button onclick="switchTab('leads', this)" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-300 hover:text-amber-400 transition-colors"><i class="fas fa-filter w-6"></i> Client Leads</button>
+            <button onclick="switchTab('agents', this)" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-300 hover:text-amber-400 transition-colors"><i class="fas fa-user-tie w-6"></i> Agent Mgmt</button>
+            <button onclick="switchTab('customers', this)" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-300 hover:text-amber-400 transition-colors"><i class="fas fa-users w-6"></i> Customer Mgmt</button>
+            <button onclick="switchTab('payments', this)" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-300 hover:text-amber-400 transition-colors relative"><i class="fas fa-wallet w-6"></i> Payments <span id="navPendingCount" class="absolute right-4 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">0</span></button>
+            <button onclick="switchTab('roles', this)" class="nav-item w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-300 hover:text-amber-400 transition-colors"><i class="fas fa-shield-halved w-6"></i> Roles & Security</button>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <header class="h-20 glass-panel flex items-center justify-between px-8 z-10 border-b border-slate-700/50">
+            <div><h2 class="text-lg font-semibold text-slate-200" id="pageTitle">Dashboard Overview</h2></div>
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-3 pl-6 border-l border-slate-700">
+                    <div class="text-right"><p class="text-sm font-bold text-amber-500">Mohit Kumar</p><p class="text-[10px] text-slate-400 uppercase tracking-widest">Director / Super Admin</p></div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 flex items-center justify-center text-slate-900 font-bold border-2 border-amber-300">MK</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 relative">
+            
+            <div id="dashboard" class="tab-content active">
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-blue-500"><p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Total Agents</p><h3 id="totalAgents" class="text-3xl font-bold text-white">0</h3></div>
+                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-purple-500"><p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Total Customers</p><h3 id="totalCustomers" class="text-3xl font-bold text-white">0</h3></div>
+                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-green-500"><p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Total Earnings</p><h3 id="totalEarnings" class="text-3xl font-bold text-white">₹0</h3></div>
+                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-red-500 relative"><p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Pending Withdrawals</p><h3 id="pendingWithdrawals" class="text-3xl font-bold text-white">0</h3></div>
+                </div>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl"><canvas id="revenueChart" height="150"></canvas></div>
+                    <div class="glass-panel p-6 rounded-2xl"><canvas id="agentChart" height="150"></canvas></div>
+                </div>
+            </div>
+
+            <div id="leads" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <input type="text" placeholder="Search leads by name or phone..." class="bg-slate-800 border border-slate-700 text-sm rounded-lg px-4 py-2 text-white w-64 outline-none">
+                    <button onclick="toggleModal('leadModal')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-4 rounded-lg text-sm transition"><i class="fas fa-plus mr-2"></i> Add New Lead</button>
+                </div>
+                <div class="glass-panel rounded-2xl overflow-hidden">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-800/80 text-xs uppercase text-slate-400"><tr><th class="px-6 py-4">Customer Name</th><th class="px-6 py-4">Source</th><th class="px-6 py-4">Agent</th><th class="px-6 py-4">Status</th></tr></thead>
+                        <tbody class="divide-y divide-slate-700/50">
+                            <tr class="hover:bg-slate-800/30 transition"><td class="px-6 py-4"><p class="font-bold text-white">Ravi Verma</p><p class="text-[10px] text-slate-500">+91 9876543210</p></td><td class="px-6 py-4"><span class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-[10px]">Facebook Ads</span></td><td class="px-6 py-4 text-amber-500">Unassigned</td><td class="px-6 py-4"><span class="bg-red-500/20 text-red-400 px-2 py-1 rounded-full text-[10px]">New</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="agents" class="tab-content">
+                <h3 class="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider border-b border-slate-700 pb-2"><i class="fas fa-hand-holding-dollar text-green-500 mr-2"></i> Pending Withdraw Requests</h3>
+                <div class="glass-panel p-5 rounded-2xl flex justify-between items-center border-l-4 border-l-amber-500">
+                    <div class="flex items-center gap-4"><div class="w-12 h-12 bg-slate-800 rounded-full flex justify-center items-center text-slate-400"><i class="fas fa-user-tie"></i></div><div><h4 class="font-bold text-white">Suresh Kumar</h4><p class="text-xs text-slate-400">Withdrawal Request</p></div></div>
+                    <div class="text-right"><h3 class="text-2xl font-bold text-green-400">₹4,500</h3></div>
+                    <div class="flex gap-2"><button class="bg-green-500 text-slate-900 font-bold px-4 py-2 rounded-lg text-sm">Approve</button><button class="bg-slate-800 text-red-400 border border-slate-600 font-bold px-4 py-2 rounded-lg text-sm">Reject</button></div>
+                </div>
+
+                <h3 class="text-sm font-semibold text-slate-300 mt-8 mb-4 uppercase tracking-wider border-b border-slate-700 pb-2"><i class="fas fa-list-ul text-blue-500 mr-2"></i> All Registered Agents</h3>
+                <div class="glass-panel rounded-2xl overflow-hidden mb-8">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-800/80 text-xs uppercase text-slate-400"><tr><th class="px-6 py-4">ID & Name</th><th class="px-6 py-4">Contact</th><th class="px-6 py-4">Earnings</th><th class="px-6 py-4">Status</th></tr></thead>
+                        <tbody id="agentsTableBody" class="divide-y divide-slate-700/50"><tr><td colspan="4" class="px-6 py-4 text-center text-slate-500">Loading agents...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="customers" class="tab-content">
+                <h3 class="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider border-b border-slate-700 pb-2"><i class="fas fa-list-ul text-purple-500 mr-2"></i> All Registered Customers</h3>
+                <div class="glass-panel rounded-2xl overflow-hidden mb-8">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-800/80 text-xs uppercase text-slate-400"><tr><th class="px-6 py-4">ID & Name</th><th class="px-6 py-4">Contact</th><th class="px-6 py-4">Assigned Agent</th><th class="px-6 py-4">Status</th></tr></thead>
+                        <tbody id="customersTableBody" class="divide-y divide-slate-700/50"><tr><td colspan="4" class="px-6 py-4 text-center text-slate-500">Loading customers...</td></tr></tbody>
+                    </table>
+                </div>
+
+                <div class="glass-panel rounded-2xl overflow-hidden p-6">
+                    <h3 class="text-sm font-semibold text-slate-300 mb-6 uppercase tracking-wider"><i class="fas fa-comment-dots text-amber-500 mr-2"></i> Direct Messaging</h3>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div><input type="text" placeholder="Message Title" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4"></div>
+                        <div><textarea rows="4" placeholder="Type message..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 resize-none"></textarea><button class="w-full bg-amber-500 text-slate-900 font-bold py-3 rounded-lg"><i class="fas fa-paper-plane mr-2"></i> Send</button></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="payments" class="tab-content">
+                <h3 class="text-lg font-bold text-white mb-6"><i class="fas fa-file-invoice-dollar text-green-500 mr-2"></i> Financial Ledger</h3>
+                <div class="glass-panel rounded-2xl overflow-hidden">
+                    <table class="w-full text-left text-sm text-slate-300"><thead class="bg-slate-800/80 text-xs uppercase text-slate-400"><tr><th class="px-6 py-4">Date</th><th class="px-6 py-4">Agent ID</th><th class="px-6 py-4">Amount</th><th class="px-6 py-4">Status</th></tr></thead><tbody class="divide-y divide-slate-700/50"><tr class="hover:bg-slate-800/30 transition"><td class="px-6 py-4">06 May 2026</td><td class="px-6 py-4 text-white font-bold">AGT-001</td><td class="px-6 py-4 text-red-400 font-bold">-₹4,500</td><td class="px-6 py-4"><span class="bg-green-500/20 text-green-400 px-2 py-1 rounded">Approved</span></td></tr></tbody></table>
+                </div>
+            </div>
+
+            <div id="roles" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-white"><i class="fas fa-user-shield text-blue-500 mr-2"></i> Sub-Admin Role Management</h3>
+                        <p class="text-sm text-slate-400">Create limited-access accounts for your team.</p>
+                    </div>
+                    <button onclick="toggleModal('roleModal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-lg shadow-blue-500/20"><i class="fas fa-plus mr-2"></i> Add Sub-Admin</button>
+                </div>
+                <div class="glass-panel rounded-2xl overflow-hidden">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-800/80 text-xs uppercase text-slate-400">
+                            <tr><th class="px-6 py-4">Name</th><th class="px-6 py-4">Role / Access Level</th><th class="px-6 py-4">Status</th><th class="px-6 py-4">Action</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700/50">
+                            <tr class="hover:bg-slate-800/30 transition">
+                                <td class="px-6 py-4"><p class="font-bold text-white">Murari</p><p class="text-[10px] text-slate-500">murari@mtef.com</p></td>
+                                <td class="px-6 py-4"><span class="bg-purple-500/20 text-purple-400 px-2 py-1 rounded text-[10px]">Payment Approver</span></td>
+                                <td class="px-6 py-4"><span class="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-[10px] border border-green-500/30">Active</span></td>
+                                <td class="px-6 py-4"><button class="text-red-400 hover:text-red-300"><i class="fas fa-trash-alt"></i> Revoke</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="leadModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="glass-panel p-8 rounded-2xl w-[400px] border border-amber-500/30 shadow-2xl relative">
+            <button onclick="toggleModal('leadModal')" class="absolute top-4 right-4 text-slate-400"><i class="fas fa-times text-xl"></i></button>
+            <h2 class="text-xl font-bold text-white mb-6 border-b border-slate-700 pb-2">Add New Client Lead</h2>
+            <input type="text" placeholder="Customer Name" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 outline-none">
+            <button onclick="toggleModal('leadModal')" class="w-full bg-amber-500 text-slate-900 font-bold py-3 rounded-lg">Save Lead</button>
+        </div>
+    </div>
+
+    <div id="roleModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="glass-panel p-8 rounded-2xl w-[400px] border border-blue-500/30 shadow-2xl relative">
+            <button onclick="toggleModal('roleModal')" class="absolute top-4 right-4 text-slate-400"><i class="fas fa-times text-xl"></i></button>
+            <h2 class="text-xl font-bold text-white mb-6 border-b border-slate-700 pb-2">Create Sub-Admin</h2>
+            <input type="text" placeholder="Full Name" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 outline-none">
+            <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white mb-6 outline-none"><option>View Only</option><option>Payment Approver</option><option>Agent Manager</option></select>
+            <button onclick="submitSubAdmin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-blue-500/20">Generate Access Link</button>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+            const titles = { 'dashboard': 'Dashboard Overview', 'leads': 'Client Leads Management', 'agents': 'Agent Intelligence', 'customers': 'Customer Direct Portal', 'payments': 'Financial Ledger & Sync', 'roles': 'Security & Roles Management' };
+            document.getElementById('pageTitle').innerText = titles[tabId];
+            
+            // Trigger Data Fetch
+            if(tabId === 'dashboard') fetchDashboardData();
+            if(tabId === 'customers') fetchList('customers');
+            if(tabId === 'agents') fetchList('agents');
+        }
+
+        function toggleModal(modalId) { document.getElementById(modalId).classList.toggle('hidden'); }
+        function submitSubAdmin() { alert('Sub-Admin access granted successfully!'); toggleModal('roleModal'); }
+
+        async function fetchDashboardData() {
+            try {
+                const res = await fetch('/api/dashboard-stats'); const data = await res.json();
+                if(data.success) {
+                    document.getElementById('totalAgents').innerText = data.data.totalAgents || 0;
+                    document.getElementById('totalCustomers').innerText = data.data.totalCustomers || 0;
+                    document.getElementById('totalEarnings').innerText = '₹' + (data.data.totalEarnings || 0);
+                    document.getElementById('pendingWithdrawals').innerText = data.data.pendingWithdrawals || 0;
+                }
+            } catch(e) {}
+        }
+
+        async function fetchList(type) {
+            try {
+                const res = await fetch('/api/' + type);
+                const data = await res.json();
+                const tbody = document.getElementById(type + 'TableBody');
+                if(data.success && data.data.length > 0) {
+                    tbody.innerHTML = '';
+                    data.data.forEach(item => {
+                        const id = type === 'agents' ? item.agentId : item.customerId;
+                        const col3 = type === 'agents' ? `<td class="px-6 py-4 text-green-400 font-bold">₹${item.totalEarnings}</td>` : `<td class="px-6 py-4 text-amber-500">${item.assignedAgent || 'Unassigned'}</td>`;
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-slate-800/30 transition">
+                                <td class="px-6 py-4"><p class="font-bold text-white">${item.name}</p><p class="text-[10px] text-slate-500">${id}</p></td>
+                                <td class="px-6 py-4"><p>${item.email}</p><p class="text-[10px] text-slate-400">${item.phone || 'N/A'}</p></td>
+                                ${col3}
+                                <td class="px-6 py-4"><span class="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-[10px]">${item.status}</span></td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-slate-500">No ${type} found.</td></tr>`;
+                }
+            } catch(e) { console.log(e); }
+        }
+
+        window.onload = function() {
+            fetchDashboardData();
+            Chart.defaults.color = '#94a3b8'; Chart.defaults.font.family = "'Poppins', sans-serif";
+            new Chart(document.getElementById('revenueChart'), { type: 'line', data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ label: 'Revenue (₹)', data: [12000, 19000, 15000, 25000, 22000, 30000, 28000], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 3, tension: 0.4, fill: true }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } } });
+            new Chart(document.getElementById('agentChart'), { type: 'bar', data: { labels: ['Ramesh','Priya','Suresh','Amit','Neha'], datasets: [{ label: 'Leads', data: [45, 38, 29, 22, 15], backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'], borderRadius: 6 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } } });
+        };
+    </script>
+</body>
+</html>

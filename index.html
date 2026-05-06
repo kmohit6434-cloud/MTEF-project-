@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTEF - Login & Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body { background-color: #050b1a; font-family: 'Poppins', sans-serif; color: white; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .role-btn { transition: 0.3s; }
+        .role-active { border-color: #f59e0b; background-color: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="loginBox" class="glass w-full max-w-md p-8 rounded-3xl shadow-2xl block">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-amber-500">MTEF</h1>
+            <p class="text-gray-400 text-sm mt-1">Master Tech Education Foundation</p>
+        </div>
+        <div class="space-y-4">
+            <input type="email" id="email" placeholder="Email Address" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 outline-none focus:border-amber-500 transition">
+            <input type="password" id="password" placeholder="Password" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 outline-none focus:border-amber-500 transition">
+            <button onclick="login()" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.3)] transition">Login to Portal</button>
+        </div>
+        <p class="text-center mt-6 text-gray-500 text-sm">Don't have an account? <span onclick="toggleView('register')" class="text-amber-500 font-bold cursor-pointer hover:underline">Register Here</span></p>
+    </div>
+
+    <div id="registerBox" class="glass w-full max-w-md p-8 rounded-3xl shadow-2xl hidden">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-amber-500">Create Account</h1>
+            <p class="text-gray-400 text-xs mt-1">Join MTEF Network</p>
+        </div>
+        <div class="space-y-4">
+            <input type="text" id="rName" placeholder="Full Name" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
+            <input type="email" id="rEmail" placeholder="Email Address" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
+            <input type="tel" id="mobileNumber" placeholder="Mobile Number" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
+            <input type="password" id="rPassword" placeholder="Create Password" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
+            
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest text-center mt-2 border-b border-gray-800 pb-2">Select Account Type</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button id="btnCustomer" onclick="selectRole('Customer')" class="role-btn role-active border border-gray-600 rounded-xl py-3 text-sm flex flex-col items-center justify-center shadow-lg"><i class="fas fa-user text-xl mb-1"></i> Customer</button>
+                <button id="btnAgent" onclick="selectRole('Agent')" class="role-btn border border-gray-600 rounded-xl py-3 text-sm flex flex-col items-center justify-center"><i class="fas fa-user-tie text-xl mb-1"></i> Agent</button>
+            </div>
+            <button onclick="registerAccount()" class="w-full bg-gradient-to-r from-amber-600 to-amber-500 text-black font-bold py-4 rounded-xl mt-2 transition">Submit Registration</button>
+        </div>
+        <p class="text-center mt-6 text-gray-500 text-sm">Already registered? <span onclick="toggleView('login')" class="text-amber-500 font-bold cursor-pointer hover:underline">Login Now</span></p>
+    </div>
+
+    <script>
+        let selectedRole = 'Customer';
+
+        function toggleView(view) {
+            document.getElementById('loginBox').style.display = view === 'login' ? 'block' : 'none';
+            document.getElementById('registerBox').style.display = view === 'register' ? 'block' : 'none';
+        }
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.getElementById('btnCustomer').classList.remove('role-active');
+            document.getElementById('btnAgent').classList.remove('role-active');
+            document.getElementById('btn' + role).classList.add('role-active');
+        }
+
+        async function registerAccount() {
+            const name = document.getElementById('rName').value.trim();
+            const email = document.getElementById('rEmail').value.trim();
+            const mobile = document.getElementById('mobileNumber').value.trim();
+            const password = document.getElementById('rPassword').value.trim();
+
+            if(!name || !email || !password || !mobile) {
+                return alert("Please fill all details!");
+            }
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        fullName: name, 
+                        email: email, 
+                        mobile: mobile, 
+                        password: password, 
+                        accountType: selectedRole 
+                    })
+                });
+                const data = await res.json();
+                alert(data.message);
+                if(data.success) toggleView('login');
+            } catch(e) { alert("Server Connection Error!"); }
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            if(!email || !password) return alert("Fill login details!");
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    window.location.href = data.redirectUrl || 'dashboard.html';
+                } else { alert(data.message); }
+            } catch(e) { alert("Login failed!"); }
+        }
+    </script>
+</body>
+</html>
