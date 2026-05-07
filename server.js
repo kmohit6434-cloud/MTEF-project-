@@ -22,8 +22,8 @@ const Agent = mongoose.model('Agent', UserSchema, 'agents');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'mohitkumarolanda@gmail.com', 
-        pass: 'cpqr fnnz pmut topw' // 👈 पेस्ट करने से पहले इसे अपने असली पासवर्ड से बदल लें!
+        user: 'mohitkumarolanda@gmail.com',
+        pass: 'cpqrfnnzpmuttopw' // 👈 मैंने यहाँ सारे स्पेस हटा दिए हैं!
     }
 });
 
@@ -43,7 +43,10 @@ app.post('/api/send-otp', async (req, res) => {
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
-        if (error) return res.json({ success: false, message: "Email send failed!" });
+        if (error) {
+            console.log("Email Error: ", error); // 👈 अगर अब कोई गड़बड़ हुई, तो रेंडर लॉग्स में दिख जाएगी
+            return res.json({ success: false, message: "Email send failed! Error: " + error.message });
+        }
         res.json({ success: true, message: "OTP sent to your email!" });
     });
 });
@@ -66,7 +69,7 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
-    // 🛡️ ADMIN CHECK (सिर्फ आपके लिए)
+    // 🛡️ ADMIN CHECK
     if (email === "mohitkumarolanda@gmail.com" && password === "Mohit@Admin786") {
         return res.json({ success: true, redirectUrl: 'admin.html' });
     }
