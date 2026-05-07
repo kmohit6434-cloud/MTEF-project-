@@ -3,6 +3,7 @@
     "body-parser": "^2.2.2",
     "express": "^5.2.1",
     "localtunnel": "^2.0.2",
-    "mongoose": "^9.6.1"
+    "mongoose": "^9.6.1",
+    "nodemailer": "^8.0.7"
   }
 }
