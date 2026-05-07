@@ -1,11 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
-const dns = require('dns');
-
-// 🚀 FIX 1: IPv4 नेटवर्क का इस्तेमाल
-dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 app.use(bodyParser.json());
@@ -22,40 +17,41 @@ const UserSchema = new mongoose.Schema({
 const Customer = mongoose.model('Customer', UserSchema, 'customers');
 const Agent = mongoose.model('Agent', UserSchema, 'agents');
 
-// 📧 EMAIL SETUP (FIX 3: Port 587 इस्तेमाल करें ताकि Timeout न हो)
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587, // 👈 यह नया रास्ता है जिसे रेंडर ब्लॉक नहीं करेगा
-    secure: false, // 👈 587 के लिए इसे false रखना होता है
-    requireTLS: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
-
 let tempOTPs = {}; 
 
-// 📩 SEND OTP API
+// 📩 SEND OTP API (🔥 THE PROFESSIONAL API WAY)
 app.post('/api/send-otp', async (req, res) => {
     const { email } = req.body;
     const otp = Math.floor(100000 + Math.random() * 900000);
     tempOTPs[email] = otp;
 
-    const mailOptions = {
-        from: 'MTEF Portal',
-        to: email,
-        subject: 'MTEF Verification OTP',
-        text: `आपका MTEF रजिस्ट्रेशन OTP है: ${otp}`
-    };
+    try {
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'api-key': process.env.BREVO_API_KEY, // 👈 यह तिजोरी से API Key लेगा
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                sender: { email: "mohitkumarolanda@gmail.com", name: "MTEF Portal" }, // 👈 यहाँ से ईमेल जाएगा
+                to: [{ email: email }],
+                subject: 'MTEF Verification OTP',
+                textContent: `आपका MTEF रजिस्ट्रेशन OTP है: ${otp}`
+            })
+        });
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log("Email Error: ", error);
-            return res.json({ success: false, message: "Email send failed! Error: " + error.message });
+        if (response.ok) {
+            res.json({ success: true, message: "OTP sent to your email!" });
+        } else {
+            const errorData = await response.json();
+            console.log("Brevo API Error: ", errorData);
+            res.json({ success: false, message: "API Error! Check Render Logs." });
         }
-        res.json({ success: true, message: "OTP sent to your email!" });
-    });
+    } catch (error) {
+        console.log("Network Error: ", error);
+        res.json({ success: false, message: "Server Connection Error" });
+    }
 });
 
 // 📝 REGISTRATION API
