@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'mohitkumarolanda@gmail.com',
-        pass: 'cpqrfnnzpmuttopw' // 👈 मैंने यहाँ सारे स्पेस हटा दिए हैं!
+        pass: 'abkx ghjf epej urmp' // 👈 यहाँ नया पासवर्ड पेस्ट करें (बिना स्पेस के)
     }
 });
 
@@ -44,7 +44,7 @@ app.post('/api/send-otp', async (req, res) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log("Email Error: ", error); // 👈 अगर अब कोई गड़बड़ हुई, तो रेंडर लॉग्स में दिख जाएगी
+            console.log("Email Error: ", error);
             return res.json({ success: false, message: "Email send failed! Error: " + error.message });
         }
         res.json({ success: true, message: "OTP sent to your email!" });
@@ -65,11 +65,10 @@ app.post('/api/register', async (req, res) => {
     } catch (err) { res.json({ success: false, message: err.message }); }
 });
 
-// 🔐 LOGIN API (With Admin Security)
+// 🔐 LOGIN API
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
-    // 🛡️ ADMIN CHECK
     if (email === "mohitkumarolanda@gmail.com" && password === "Mohit@Admin786") {
         return res.json({ success: true, redirectUrl: 'admin.html' });
     }
