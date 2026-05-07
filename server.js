@@ -30,11 +30,11 @@ app.post('/api/send-otp', async (req, res) => {
             method: 'POST',
             headers: {
                 'accept': 'application/json',
-                'api-key': process.env.BREVO_API_KEY, // 👈 यह तिजोरी से API Key लेगा
+                'api-key': process.env.BREVO_API_KEY, 
                 'content-type': 'application/json'
             },
             body: JSON.stringify({
-                sender: { email: "mohitkumarolanda@gmail.com", name: "MTEF Portal" }, // 👈 यहाँ से ईमेल जाएगा
+                sender: { email: "Sanjaygupta9188@gmail.com", name: "MTEF Portal" }, 
                 to: [{ email: email }],
                 subject: 'MTEF Verification OTP',
                 textContent: `आपका MTEF रजिस्ट्रेशन OTP है: ${otp}`
