@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const dns = require('dns');
 
-// 🚀 FIX 1: IPv4 नेटवर्क का इस्तेमाल (Render Error Fix)
+// 🚀 FIX 1: IPv4 नेटवर्क का इस्तेमाल
 dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
@@ -22,11 +22,12 @@ const UserSchema = new mongoose.Schema({
 const Customer = mongoose.model('Customer', UserSchema, 'customers');
 const Agent = mongoose.model('Agent', UserSchema, 'agents');
 
-// 📧 EMAIL SETUP (FIX 2: Brahmastra - तिजोरी से पासवर्ड)
+// 📧 EMAIL SETUP (FIX 3: Port 587 इस्तेमाल करें ताकि Timeout न हो)
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    port: 587, // 👈 यह नया रास्ता है जिसे रेंडर ब्लॉक नहीं करेगा
+    secure: false, // 👈 587 के लिए इसे false रखना होता है
+    requireTLS: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
