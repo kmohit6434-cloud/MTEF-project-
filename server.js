@@ -2,10 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
-const dns = require('dns');
-
-// 🚀 FIX: रेंडर को मजबूर करें कि वो पुराना और पक्का IPv4 नेटवर्क इस्तेमाल करे
-dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 app.use(bodyParser.json());
@@ -22,14 +18,14 @@ const UserSchema = new mongoose.Schema({
 const Customer = mongoose.model('Customer', UserSchema, 'customers');
 const Agent = mongoose.model('Agent', UserSchema, 'agents');
 
-// 📧 EMAIL SETUP (Nodemailer) - IPv4 Fix
+// 📧 EMAIL SETUP (Nodemailer) - BRAHMASTRA FIX
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
     auth: {
-        user: 'mohitkumarolanda@gmail.com',
-        pass: 'abkxghjfepejurmp' // 👈 अपना पासवर्ड यहाँ डालें
+        user: process.env.EMAIL_USER, // 👈 अब ईमेल रेंडर की तिजोरी से आएगा
+        pass: process.env.EMAIL_PASS  // 👈 अब पासवर्ड रेंडर की तिजोरी से आएगा
     }
 });
 
