@@ -19,7 +19,7 @@
 <body>
     <div class="box">
         <h2>Admin Login</h2>
-        <input type="text" id="email" placeholder="Admin Email ID">
+        <input type="text" id="email" placeholder="Admin Username / Email">
         <input type="password" id="password" placeholder="Admin Password">
         <button onclick="adminLogin()">Login to Dashboard</button>
         <div class="links">
@@ -32,7 +32,7 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            if(!email || !password) return alert("Email और Password डालें!");
+            if(!email || !password) return alert("Email/Username और Password डालें!");
 
             const res = await fetch('/api/login', {
                 method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -42,7 +42,6 @@
             
             if(data.success && data.redirectUrl === 'admin.html') {
                 alert("Welcome Admin!");
-                // Here you would redirect to the actual dashboard page
             } else {
                 alert("गलत Admin Credentials!");
             }

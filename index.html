@@ -52,7 +52,6 @@
     </div>
 
     <script>
-        // Captcha Logic
         let n1 = Math.floor(Math.random() * 10) + 1;
         let n2 = Math.floor(Math.random() * 10) + 1;
         document.getElementById('captcha-text').innerText = n1 + " + " + n2 + " = ?";
@@ -86,8 +85,7 @@
 
             const res = await fetch('/api/register', {
                 method: 'POST', headers: {'Content-Type': 'application/json'},
-                // Sending empty email as backend currently expects it, though we don't use it now
-                body: JSON.stringify({ fullName, email: "", mobile, password, accountType, otp }) 
+                body: JSON.stringify({ fullName, email: "no-email@mtef.com", mobile, password, accountType, otp }) 
             });
             const data = await res.json();
             alert(data.message);
