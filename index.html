@@ -10,7 +10,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         body { background-color: #050b1a; font-family: 'Poppins', sans-serif; color: white; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .role-btn { transition: 0.3s; }
         .role-active { border-color: #f59e0b; background-color: rgba(245, 158, 11, 0.15); color: #f59e0b; }
     </style>
 </head>
@@ -24,7 +23,7 @@
         <div class="space-y-4">
             <input type="email" id="email" placeholder="Email Address" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 outline-none focus:border-amber-500 transition">
             <input type="password" id="password" placeholder="Password" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 outline-none focus:border-amber-500 transition">
-            <button onclick="login()" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.3)] transition">Login to Portal</button>
+            <button onclick="login()" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-4 rounded-xl transition">Login to Portal</button>
         </div>
         <p class="text-center mt-6 text-gray-500 text-sm">Don't have an account? <span onclick="toggleView('register')" class="text-amber-500 font-bold cursor-pointer hover:underline">Register Here</span></p>
     </div>
@@ -32,22 +31,30 @@
     <div id="registerBox" class="glass w-full max-w-md p-8 rounded-3xl shadow-2xl hidden">
         <div class="text-center mb-6">
             <h1 class="text-2xl font-bold text-amber-500">Create Account</h1>
-            <p class="text-gray-400 text-xs mt-1">Join MTEF Network</p>
+            <p class="text-gray-400 text-sm mt-1">Join MTEF Network</p>
         </div>
-        <div class="space-y-4">
+        <div class="space-y-3">
             <input type="text" id="rName" placeholder="Full Name" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
-            <input type="email" id="rEmail" placeholder="Email Address" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
+            
+            <div class="flex gap-2">
+                <input type="email" id="rEmail" placeholder="Email Address" class="flex-1 bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
+                <button onclick="sendOTP()" id="otpBtn" class="bg-amber-500 text-black text-sm font-bold px-4 rounded-xl hover:bg-amber-600 transition">Send OTP</button>
+            </div>
+
+            <input type="number" id="otpInput" placeholder="Enter 6-Digit OTP" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition hidden">
+            
             <input type="tel" id="mobileNumber" placeholder="Mobile Number" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
             <input type="password" id="rPassword" placeholder="Create Password" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
             
-            <p class="text-[10px] text-gray-400 uppercase tracking-widest text-center mt-2 border-b border-gray-800 pb-2">Select Account Type</p>
+            <p class="text-[10px] text-gray-400 text-center uppercase tracking-widest mt-2">SELECT ACCOUNT TYPE</p>
             <div class="grid grid-cols-2 gap-3">
-                <button id="btnCustomer" onclick="selectRole('Customer')" class="role-btn role-active border border-gray-600 rounded-xl py-3 text-sm flex flex-col items-center justify-center shadow-lg"><i class="fas fa-user text-xl mb-1"></i> Customer</button>
-                <button id="btnAgent" onclick="selectRole('Agent')" class="role-btn border border-gray-600 rounded-xl py-3 text-sm flex flex-col items-center justify-center"><i class="fas fa-user-tie text-xl mb-1"></i> Agent</button>
+                <button id="btnCustomer" onclick="selectRole('Customer')" class="role-active border border-gray-600 rounded-xl py-3 text-sm flex flex-col items-center justify-center gap-1"><i class="fas fa-user text-lg"></i>Customer</button>
+                <button id="btnAgent" onclick="selectRole('Agent')" class="border border-gray-600 rounded-xl py-3 text-sm flex flex-col items-center justify-center gap-1"><i class="fas fa-user-tie text-lg"></i>Agent</button>
             </div>
-            <button onclick="registerAccount()" class="w-full bg-gradient-to-r from-amber-600 to-amber-500 text-black font-bold py-4 rounded-xl mt-2 transition">Submit Registration</button>
+            
+            <button onclick="registerAccount()" id="regBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-4 rounded-xl mt-2 opacity-50 cursor-not-allowed transition" disabled>Submit Registration</button>
         </div>
-        <p class="text-center mt-6 text-gray-500 text-sm">Already registered? <span onclick="toggleView('login')" class="text-amber-500 font-bold cursor-pointer hover:underline">Login Now</span></p>
+        <p class="text-center mt-4 text-gray-500 text-sm">Already registered? <span onclick="toggleView('login')" class="text-amber-500 font-bold cursor-pointer">Login Now</span></p>
     </div>
 
     <script>
@@ -60,55 +67,90 @@
 
         function selectRole(role) {
             selectedRole = role;
-            document.getElementById('btnCustomer').classList.remove('role-active');
-            document.getElementById('btnAgent').classList.remove('role-active');
-            document.getElementById('btn' + role).classList.add('role-active');
+            document.getElementById('btnCustomer').classList.toggle('role-active', role === 'Customer');
+            document.getElementById('btnAgent').classList.toggle('role-active', role === 'Agent');
+        }
+
+        async function sendOTP() {
+            const email = document.getElementById('rEmail').value;
+            if(!email) return alert("Please enter Email Address first!");
+            
+            const btn = document.getElementById('otpBtn');
+            btn.innerText = "Sending...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                
+                alert(data.message);
+                
+                if(data.success) {
+                    document.getElementById('otpInput').classList.remove('hidden');
+                    document.getElementById('regBtn').disabled = false;
+                    document.getElementById('regBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.innerText = "Sent ✅";
+                } else {
+                    btn.innerText = "Send OTP";
+                    btn.disabled = false;
+                }
+            } catch(err) {
+                alert("Error sending OTP. Check internet connection.");
+                btn.innerText = "Send OTP";
+                btn.disabled = false;
+            }
         }
 
         async function registerAccount() {
-            const name = document.getElementById('rName').value.trim();
-            const email = document.getElementById('rEmail').value.trim();
-            const mobile = document.getElementById('mobileNumber').value.trim();
-            const password = document.getElementById('rPassword').value.trim();
+            const payload = {
+                fullName: document.getElementById('rName').value,
+                email: document.getElementById('rEmail').value,
+                mobile: document.getElementById('mobileNumber').value,
+                password: document.getElementById('rPassword').value,
+                otp: document.getElementById('otpInput').value,
+                accountType: selectedRole
+            };
 
-            if(!name || !email || !password || !mobile) {
-                return alert("Please fill all details!");
+            if(!payload.otp) return alert("Please enter the 6-digit OTP!");
+
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            alert(data.message);
+            if(data.success) {
+                toggleView('login');
+                // Clear fields
+                document.getElementById('rName').value = '';
+                document.getElementById('rEmail').value = '';
+                document.getElementById('mobileNumber').value = '';
+                document.getElementById('rPassword').value = '';
+                document.getElementById('otpInput').value = '';
+                document.getElementById('otpInput').classList.add('hidden');
+                document.getElementById('otpBtn').innerText = "Send OTP";
+                document.getElementById('otpBtn').disabled = false;
+                document.getElementById('regBtn').disabled = true;
+                document.getElementById('regBtn').classList.add('opacity-50', 'cursor-not-allowed');
             }
-
-            try {
-                const res = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        fullName: name, 
-                        email: email, 
-                        mobile: mobile, 
-                        password: password, 
-                        accountType: selectedRole 
-                    })
-                });
-                const data = await res.json();
-                alert(data.message);
-                if(data.success) toggleView('login');
-            } catch(e) { alert("Server Connection Error!"); }
         }
 
         async function login() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            if(!email || !password) return alert("Fill login details!");
-
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
-                if(data.success) {
-                    window.location.href = data.redirectUrl || 'dashboard.html';
-                } else { alert(data.message); }
-            } catch(e) { alert("Login failed!"); }
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if(data.success) window.location.href = data.redirectUrl;
+            else alert(data.message);
         }
     </script>
 </body>
