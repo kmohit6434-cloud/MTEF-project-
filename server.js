@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'mohitkumarolanda@gmail.com',
-        pass: 'abkx ghjf epej urmp' // 👈 यहाँ नया पासवर्ड पेस्ट करें (बिना स्पेस के)
+        pass: 'abkxghjfepejurmp' // 👈 जैसे: cpqrfnnzpmuttopw
     }
 });
 
