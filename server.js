@@ -19,7 +19,7 @@ const Agent = mongoose.model('Agent', UserSchema, 'agents');
 
 let tempOTPs = {}; 
 
-// 📱 SEND MOBILE OTP API (Fast2SMS)
+// 📱 SEND MOBILE OTP API (Fast2SMS QUICK ROUTE - NO VERIFICATION NEEDED 🚀)
 app.post('/api/send-otp', async (req, res) => {
     const { mobile } = req.body; 
     
@@ -28,18 +28,19 @@ app.post('/api/send-otp', async (req, res) => {
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000);
-    tempOTPs[mobile] = otp; // OTP को मोबाइल नंबर के साथ सेव किया
+    tempOTPs[mobile] = otp; 
 
     try {
         const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
             method: 'POST',
             headers: {
-                'authorization': process.env.FAST2SMS_API_KEY, // 👈 रेंडर से Fast2SMS की चाबी लेगा
+                'authorization': process.env.FAST2SMS_API_KEY, 
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                route: 'otp',
-                variables_values: otp.toString(),
+                route: 'q',  // 👈 यहाँ हमने रास्ता 'q' (Quick) कर दिया है!
+                message: `MTEF Portal Registration OTP is: ${otp}`, // सीधा मैसेज
+                flash: 0,
                 numbers: mobile
             })
         });
@@ -50,7 +51,7 @@ app.post('/api/send-otp', async (req, res) => {
             res.json({ success: true, message: "OTP आपके मोबाइल नंबर पर भेज दिया गया है!" });
         } else {
             console.log("Fast2SMS Error: ", data);
-            res.json({ success: false, message: "SMS API Error! Number check करें।" });
+            res.json({ success: false, message: "SMS API Error! Logs check करें।" });
         }
     } catch (error) {
         console.log("Network Error: ", error);
@@ -63,7 +64,6 @@ app.post('/api/register', async (req, res) => {
     try {
         const { fullName, email, mobile, password, accountType, otp } = req.body;
         
-        // अब OTP मोबाइल नंबर से चेक होगा
         if (tempOTPs[mobile] != otp) return res.json({ success: false, message: 'Invalid OTP! गलत OTP' });
 
         const Model = accountType === 'Agent' ? Agent : Customer;
