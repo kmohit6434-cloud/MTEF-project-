@@ -3,154 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTEF - Login & Register</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>MTEF Registration</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        body { background-color: #050b1a; font-family: 'Poppins', sans-serif; color: white; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .role-active { border-color: #f59e0b; background-color: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        body { background-color: #0b0f19; color: #fff; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background-color: #1a2235; padding: 30px; border-radius: 10px; width: 320px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #f5b041; margin-top: 0; margin-bottom: 20px; font-size: 24px;}
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: none; box-sizing: border-box; font-size: 14px;}
+        input, select { background-color: #2a354f; color: #fff; outline: none;}
+        input::placeholder { color: #aaa; }
+        button { background-color: #f5b041; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #d49536; }
+        .captcha-box { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+        .captcha-text { background: #2a354f; padding: 10px 15px; border-radius: 5px; font-weight: bold; font-size: 16px; color: #f5b041;}
+        .links { text-align: center; margin-top: 15px; font-size: 14px; }
+        .links a { color: #f5b041; text-decoration: none; }
+        hr { border: 1px solid #2a354f; margin: 20px 0; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body>
+    <div class="box">
+        <h2>Registration</h2>
+        
+        <input type="text" id="fullName" placeholder="Full Name (पूरा नाम)">
+        <input type="number" id="age" placeholder="Age (उम्र)">
+        <input type="number" id="mobile" placeholder="Mobile Number (10 अंक)">
+        
+        <button id="otp-btn" onclick="sendOTP()">Send OTP</button>
+        
+        <input type="text" id="otp" placeholder="Enter OTP (यहाँ OTP डालें)">
+        <input type="password" id="password" placeholder="Create Password (पासवर्ड बनाएँ)">
+        
+        <div class="captcha-box">
+            <div id="captcha-text" class="captcha-text"></div>
+            <input type="number" id="captcha-ans" placeholder="Captcha Answer">
+        </div>
 
-    <div id="loginBox" class="glass w-full max-w-md p-8 rounded-3xl shadow-2xl block">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-amber-500">MTEF</h1>
-            <p class="text-gray-400 text-sm mt-1">Master Tech Education Foundation</p>
-        </div>
-        <div class="space-y-4">
-            <input type="email" id="email" placeholder="Email Address" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 outline-none focus:border-amber-500 transition">
-            <input type="password" id="password" placeholder="Password" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 outline-none focus:border-amber-500 transition">
-            <button onclick="login()" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-4 rounded-xl transition">Login to Portal</button>
-        </div>
-        <p class="text-center mt-6 text-gray-500 text-sm">Don't have an account? <span onclick="toggleView('register')" class="text-amber-500 font-bold cursor-pointer hover:underline">Register Here</span></p>
-    </div>
+        <select id="accountType">
+            <option value="Customer">Customer (ग्राहक)</option>
+            <option value="Agent">Agent (एजेंट)</option>
+        </select>
+        
+        <button onclick="register()" style="margin-top: 15px;">Registration</button>
 
-    <div id="registerBox" class="glass w-full max-w-md p-8 rounded-3xl shadow-2xl hidden">
-        <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-amber-500">Create Account</h1>
-            <p class="text-gray-400 text-sm mt-1">Join MTEF Network</p>
+        <hr>
+        <div class="links">
+            <a href="admin.html">Admin Login Page</a>
         </div>
-        <div class="space-y-3">
-            <input type="text" id="rName" placeholder="Full Name" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
-            
-            <div class="flex gap-2">
-                <input type="email" id="rEmail" placeholder="Email Address" class="flex-1 bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
-                <button onclick="sendOTP()" id="otpBtn" class="bg-amber-500 text-black text-sm font-bold px-4 rounded-xl hover:bg-amber-600 transition">Send OTP</button>
-            </div>
-
-            <input type="number" id="otpInput" placeholder="Enter 6-Digit OTP" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition hidden">
-            
-            <input type="tel" id="mobileNumber" placeholder="Mobile Number" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
-            <input type="password" id="rPassword" placeholder="Create Password" class="w-full bg-black/40 border border-gray-700 rounded-xl p-3 outline-none focus:border-amber-500 transition">
-            
-            <p class="text-[10px] text-gray-400 text-center uppercase tracking-widest mt-2">SELECT ACCOUNT TYPE</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button id="btnCustomer" onclick="selectRole('Customer')" class="role-active border border-gray-600 rounded-xl py-3 text-sm flex flex-col items-center justify-center gap-1"><i class="fas fa-user text-lg"></i>Customer</button>
-                <button id="btnAgent" onclick="selectRole('Agent')" class="border border-gray-600 rounded-xl py-3 text-sm flex flex-col items-center justify-center gap-1"><i class="fas fa-user-tie text-lg"></i>Agent</button>
-            </div>
-            
-            <button onclick="registerAccount()" id="regBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-4 rounded-xl mt-2 opacity-50 cursor-not-allowed transition" disabled>Submit Registration</button>
-        </div>
-        <p class="text-center mt-4 text-gray-500 text-sm">Already registered? <span onclick="toggleView('login')" class="text-amber-500 font-bold cursor-pointer">Login Now</span></p>
     </div>
 
     <script>
-        let selectedRole = 'Customer';
-
-        function toggleView(view) {
-            document.getElementById('loginBox').style.display = view === 'login' ? 'block' : 'none';
-            document.getElementById('registerBox').style.display = view === 'register' ? 'block' : 'none';
-        }
-
-        function selectRole(role) {
-            selectedRole = role;
-            document.getElementById('btnCustomer').classList.toggle('role-active', role === 'Customer');
-            document.getElementById('btnAgent').classList.toggle('role-active', role === 'Agent');
-        }
+        // Captcha Logic
+        let n1 = Math.floor(Math.random() * 10) + 1;
+        let n2 = Math.floor(Math.random() * 10) + 1;
+        document.getElementById('captcha-text').innerText = n1 + " + " + n2 + " = ?";
 
         async function sendOTP() {
-            const email = document.getElementById('rEmail').value;
-            if(!email) return alert("Please enter Email Address first!");
+            const mobile = document.getElementById('mobile').value;
+            if(mobile.length !== 10) return alert('कृपया 10 अंकों का सही मोबाइल नंबर डालें!');
             
-            const btn = document.getElementById('otpBtn');
-            btn.innerText = "Sending...";
-            btn.disabled = true;
-
+            document.getElementById('otp-btn').innerText = 'Sending...';
             try {
                 const res = await fetch('/api/send-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ mobile })
                 });
                 const data = await res.json();
-                
                 alert(data.message);
-                
-                if(data.success) {
-                    document.getElementById('otpInput').classList.remove('hidden');
-                    document.getElementById('regBtn').disabled = false;
-                    document.getElementById('regBtn').classList.remove('opacity-50', 'cursor-not-allowed');
-                    btn.innerText = "Sent ✅";
-                } else {
-                    btn.innerText = "Send OTP";
-                    btn.disabled = false;
-                }
-            } catch(err) {
-                alert("Error sending OTP. Check internet connection.");
-                btn.innerText = "Send OTP";
-                btn.disabled = false;
-            }
+            } catch(e) { alert("Error connecting to server"); }
+            document.getElementById('otp-btn').innerText = 'Send OTP';
         }
 
-        async function registerAccount() {
-            const payload = {
-                fullName: document.getElementById('rName').value,
-                email: document.getElementById('rEmail').value,
-                mobile: document.getElementById('mobileNumber').value,
-                password: document.getElementById('rPassword').value,
-                otp: document.getElementById('otpInput').value,
-                accountType: selectedRole
-            };
+        async function register() {
+            const fullName = document.getElementById('fullName').value;
+            const mobile = document.getElementById('mobile').value;
+            const password = document.getElementById('password').value;
+            const otp = document.getElementById('otp').value;
+            const accountType = document.getElementById('accountType').value;
+            const captchaAns = document.getElementById('captcha-ans').value;
 
-            if(!payload.otp) return alert("Please enter the 6-digit OTP!");
+            if(!fullName || !mobile || !password || !otp) return alert('कृपया सभी जानकारी भरें!');
+            if (parseInt(captchaAns) !== (n1 + n2)) return alert('Captcha गलत है! सही जोड़ भरें।');
 
             const res = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                // Sending empty email as backend currently expects it, though we don't use it now
+                body: JSON.stringify({ fullName, email: "", mobile, password, accountType, otp }) 
             });
             const data = await res.json();
             alert(data.message);
-            if(data.success) {
-                toggleView('login');
-                // Clear fields
-                document.getElementById('rName').value = '';
-                document.getElementById('rEmail').value = '';
-                document.getElementById('mobileNumber').value = '';
-                document.getElementById('rPassword').value = '';
-                document.getElementById('otpInput').value = '';
-                document.getElementById('otpInput').classList.add('hidden');
-                document.getElementById('otpBtn').innerText = "Send OTP";
-                document.getElementById('otpBtn').disabled = false;
-                document.getElementById('regBtn').disabled = true;
-                document.getElementById('regBtn').classList.add('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        async function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await res.json();
-            if(data.success) window.location.href = data.redirectUrl;
-            else alert(data.message);
+            if(data.success) window.location.reload();
         }
     </script>
 </body>
