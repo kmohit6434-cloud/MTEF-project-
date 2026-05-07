@@ -19,34 +19,38 @@ const Agent = mongoose.model('Agent', UserSchema, 'agents');
 
 let tempOTPs = {}; 
 
-// 📩 SEND OTP API (🔥 THE PROFESSIONAL API WAY)
+// 📱 SEND MOBILE OTP API (Fast2SMS)
 app.post('/api/send-otp', async (req, res) => {
-    const { email } = req.body;
+    const { mobile } = req.body; 
+    
+    if (!mobile || mobile.length !== 10) {
+        return res.json({ success: false, message: "कृपया सही 10-अंकों का मोबाइल नंबर डालें!" });
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000);
-    tempOTPs[email] = otp;
+    tempOTPs[mobile] = otp; // OTP को मोबाइल नंबर के साथ सेव किया
 
     try {
-        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
             method: 'POST',
             headers: {
-                'accept': 'application/json',
-                'api-key': process.env.BREVO_API_KEY, 
-                'content-type': 'application/json'
+                'authorization': process.env.FAST2SMS_API_KEY, // 👈 रेंडर से Fast2SMS की चाबी लेगा
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                sender: { email: "Sanjaygupta9188@gmail.com", name: "MTEF Portal" }, 
-                to: [{ email: email }],
-                subject: 'MTEF Verification OTP',
-                textContent: `आपका MTEF रजिस्ट्रेशन OTP है: ${otp}`
+                route: 'otp',
+                variables_values: otp.toString(),
+                numbers: mobile
             })
         });
 
-        if (response.ok) {
-            res.json({ success: true, message: "OTP sent to your email!" });
+        const data = await response.json();
+        
+        if (data.return) {
+            res.json({ success: true, message: "OTP आपके मोबाइल नंबर पर भेज दिया गया है!" });
         } else {
-            const errorData = await response.json();
-            console.log("Brevo API Error: ", errorData);
-            res.json({ success: false, message: "API Error! Check Render Logs." });
+            console.log("Fast2SMS Error: ", data);
+            res.json({ success: false, message: "SMS API Error! Number check करें।" });
         }
     } catch (error) {
         console.log("Network Error: ", error);
@@ -58,12 +62,14 @@ app.post('/api/send-otp', async (req, res) => {
 app.post('/api/register', async (req, res) => {
     try {
         const { fullName, email, mobile, password, accountType, otp } = req.body;
-        if (tempOTPs[email] != otp) return res.json({ success: false, message: 'Invalid OTP!' });
+        
+        // अब OTP मोबाइल नंबर से चेक होगा
+        if (tempOTPs[mobile] != otp) return res.json({ success: false, message: 'Invalid OTP! गलत OTP' });
 
         const Model = accountType === 'Agent' ? Agent : Customer;
         const newUser = new Model({ fullName, email, mobile, password, accountType });
         await newUser.save();
-        delete tempOTPs[email];
+        delete tempOTPs[mobile];
         res.json({ success: true, message: 'Account Created Successfully!' });
     } catch (err) { res.json({ success: false, message: err.message }); }
 });
