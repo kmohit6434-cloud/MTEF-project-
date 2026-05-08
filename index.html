@@ -3,93 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTEF Registration</title>
+    <title>MTEF - Login</title>
     <style>
-        body { background-color: #0b0f19; color: #fff; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background-color: #1a2235; padding: 30px; border-radius: 10px; width: 320px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        h2 { text-align: center; color: #f5b041; margin-top: 0; margin-bottom: 20px; font-size: 24px;}
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 5px; border: none; box-sizing: border-box; font-size: 14px;}
-        input, select { background-color: #2a354f; color: #fff; outline: none;}
-        input::placeholder { color: #aaa; }
+        body { background-color: #0b0f19; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background-color: #1a2235; padding: 40px; border-radius: 12px; width: 340px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; }
+        h2 { color: #f5b041; margin-bottom: 25px; font-size: 28px; }
+        input, button { width: 100%; padding: 14px; margin: 12px 0; border-radius: 6px; border: none; box-sizing: border-box; font-size: 15px; }
+        input { background-color: #2a354f; color: #fff; outline: none; border: 1px solid #3e4b6e; }
         button { background-color: #f5b041; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; }
         button:hover { background-color: #d49536; }
-        .captcha-box { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
-        .captcha-text { background: #2a354f; padding: 10px 15px; border-radius: 5px; font-weight: bold; font-size: 16px; color: #f5b041;}
-        .links { text-align: center; margin-top: 15px; font-size: 14px; }
-        .links a { color: #f5b041; text-decoration: none; }
-        hr { border: 1px solid #2a354f; margin: 20px 0; }
+        .links { margin-top: 20px; font-size: 14px; color: #aaa; }
+        .links a { color: #f5b041; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="box">
-        <h2>Registration</h2>
-        
-        <input type="text" id="fullName" placeholder="Full Name (पूरा नाम)">
-        <input type="number" id="age" placeholder="Age (उम्र)">
-        <input type="number" id="mobile" placeholder="Mobile Number (10 अंक)">
-        
-        <button id="otp-btn" onclick="sendOTP()">Send OTP</button>
-        
-        <input type="text" id="otp" placeholder="Enter OTP (यहाँ OTP डालें)">
-        <input type="password" id="password" placeholder="Create Password (पासवर्ड बनाएँ)">
-        
-        <div class="captcha-box">
-            <div id="captcha-text" class="captcha-text"></div>
-            <input type="number" id="captcha-ans" placeholder="Captcha Answer">
-        </div>
-
-        <select id="accountType">
-            <option value="Customer">Customer (ग्राहक)</option>
-            <option value="Agent">Agent (एजेंट)</option>
-        </select>
-        
-        <button onclick="register()" style="margin-top: 15px;">Registration</button>
-
-        <hr>
+        <h2>MTEF LOGIN</h2>
+        <input type="text" id="id" placeholder="Mobile Number or Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
         <div class="links">
-            <a href="admin.html">Admin Login Page</a>
+            New user? <a href="register.html">Create an Account</a>
         </div>
     </div>
 
     <script>
-        let n1 = Math.floor(Math.random() * 10) + 1;
-        let n2 = Math.floor(Math.random() * 10) + 1;
-        document.getElementById('captcha-text').innerText = n1 + " + " + n2 + " = ?";
-
-        async function sendOTP() {
-            const mobile = document.getElementById('mobile').value;
-            if(mobile.length !== 10) return alert('कृपया 10 अंकों का सही मोबाइल नंबर डालें!');
-            
-            document.getElementById('otp-btn').innerText = 'Sending...';
-            try {
-                const res = await fetch('/api/send-otp', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ mobile })
-                });
-                const data = await res.json();
-                alert(data.message);
-            } catch(e) { alert("Error connecting to server"); }
-            document.getElementById('otp-btn').innerText = 'Send OTP';
-        }
-
-        async function register() {
-            const fullName = document.getElementById('fullName').value;
-            const mobile = document.getElementById('mobile').value;
+        async function login() {
+            const email = document.getElementById('id').value;
             const password = document.getElementById('password').value;
-            const otp = document.getElementById('otp').value;
-            const accountType = document.getElementById('accountType').value;
-            const captchaAns = document.getElementById('captcha-ans').value;
+            if(!email || !password) return alert("Please enter credentials");
 
-            if(!fullName || !mobile || !password || !otp) return alert('कृपया सभी जानकारी भरें!');
-            if (parseInt(captchaAns) !== (n1 + n2)) return alert('Captcha गलत है! सही जोड़ भरें।');
-
-            const res = await fetch('/api/register', {
+            const res = await fetch('/api/login', {
                 method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ fullName, email: "no-email@mtef.com", mobile, password, accountType, otp }) 
+                body: JSON.stringify({ email, password })
             });
             const data = await res.json();
-            alert(data.message);
-            if(data.success) window.location.reload();
+            if(data.success) {
+                localStorage.setItem('userSession', email);
+                window.location.href = data.redirectUrl;
+            } else {
+                alert(data.message);
+            }
         }
     </script>
 </body>
