@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTEF - Registration</title>
+    <style>
+        body { background-color: #0b0f19; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 20px 0; }
+        .box { background-color: #1a2235; padding: 30px; border-radius: 12px; width: 350px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #f5b041; margin-bottom: 20px; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: none; box-sizing: border-box; }
+        input, select { background-color: #2a354f; color: #fff; border: 1px solid #3e4b6e; }
+        button { background-color: #f5b041; color: #000; font-weight: bold; cursor: pointer; }
+        .captcha-row { display: flex; align-items: center; gap: 10px; }
+        .captcha-txt { background: #2a354f; padding: 10px; border-radius: 6px; color: #f5b041; font-weight: bold; min-width: 60px; text-align: center; }
+        .login-link { text-align: center; margin-top: 15px; font-size: 14px; }
+        .login-link a { color: #f5b041; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>REGISTRATION</h2>
+        <input type="text" id="name" placeholder="Full Name">
+        <input type="number" id="age" placeholder="Age">
+        <input type="number" id="mobile" placeholder="Mobile Number">
+        <button id="otp-btn" onclick="sendOTP()">Get OTP</button>
+        <input type="text" id="otp" placeholder="Enter OTP">
+        <input type="password" id="password" placeholder="Set Password">
+        
+        <div class="captcha-row">
+            <div id="cap-txt" class="captcha-txt"></div>
+            <input type="number" id="cap-ans" placeholder="Answer">
+        </div>
+
+        <select id="type">
+            <option value="Customer">Customer</option>
+            <option value="Agent">Agent</option>
+        </select>
+        
+        <button onclick="register()" style="background-color: #27ae60; color: white; margin-top: 10px;">Submit Registration</button>
+        <div class="login-link">Already have an account? <a href="index.html">Login</a></div>
+    </div>
+
+    <script>
+        let n1 = Math.floor(Math.random() * 10) + 1;
+        let n2 = Math.floor(Math.random() * 10) + 1;
+        document.getElementById('cap-txt').innerText = n1 + " + " + n2;
+
+        async function sendOTP() {
+            const mobile = document.getElementById('mobile').value;
+            if(mobile.length !== 10) return alert("Enter valid 10-digit number");
+            
+            document.getElementById('otp-btn').innerText = 'Sending...';
+            const res = await fetch('/api/send-otp', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ mobile })
+            });
+            const data = await res.json();
+            alert(data.message);
+            document.getElementById('otp-btn').innerText = 'Get OTP';
+        }
+
+        async function register() {
+            const ans = document.getElementById('cap-ans').value;
+            if(parseInt(ans) !== (n1+n2)) return alert("Wrong Captcha");
+            
+            const payload = {
+                fullName: document.getElementById('name').value,
+                mobile: document.getElementById('mobile').value,
+                password: document.getElementById('password').value,
+                otp: document.getElementById('otp').value,
+                accountType: document.getElementById('type').value,
+                email: "" 
+            };
+
+            const res = await fetch('/api/register', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            alert(data.message);
+            if(data.success) window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
