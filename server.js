@@ -8,107 +8,95 @@ app.use(express.static('./'));
 
 const mongoURI = process.env.MONGODB_URI;
 
+// 🛑 SCHEMA UPDATED: Project Data tracking added
 const UserSchema = new mongoose.Schema({
-    fullName: String, mobile: String, password: String, accountType: String,
-    userId: String,
-    bankDetails: { bankName: String, accHolder: String, accNumber: String, ifsc: String }
+    fullName: String, mobile: String, password: String, accountType: String, userId: String,
+    bankDetails: { bankName: String, accHolder: String, accNumber: String, ifsc: String },
+    projectData: {
+        progress: { type: Number, default: 0 },
+        advancePaid: { type: Number, default: 0 },
+        balanceDue: { type: Number, default: 0 },
+        dueDate: { type: String, default: 'Under Process' },
+        statusText: { type: String, default: 'Pending Initiation' },
+        serviceName: { type: String, default: 'Not Assigned' }
+    }
 });
 const Customer = mongoose.model('Customer', UserSchema, 'customers');
 const Agent = mongoose.model('Agent', UserSchema, 'agents');
 
 mongoose.connect(mongoURI).then(async () => {
     console.log('✅ Connected to MongoDB');
-    
-    // Auto Customer (Aapka account)
     const exists = await Customer.findOne({ mobile: '7891769227' });
     if (!exists) {
-        await new Customer({ fullName: 'Mohit (Direct Customer)', mobile: '7891769227', password: '0580', accountType: 'Customer', userId: 'MTEF@6866' }).save();
+        await new Customer({ fullName: 'Mohit', mobile: '7891769227', password: '0580', accountType: 'Customer', userId: 'MTEF@6866' }).save();
     }
 }).catch(e => console.log(e));
 
-let tempOTPs = {}; 
-let otpLimits = {};
+app.post('/api/send-otp', async (req, res) => { res.json({ success: true, message: "OTP Bypassed for now" }); });
 
-app.post('/api/send-otp', async (req, res) => {
-    const { mobile } = req.body;
-    if (!otpLimits[mobile]) otpLimits[mobile] = 0;
-    if (otpLimits[mobile] >= 3) return res.json({ success: false, message: "Limit: Max 3 OTPs allowed" });
-
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    tempOTPs[mobile] = otp; 
-    
-    try {
-        const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-            method: 'POST', headers: { 'authorization': process.env.FAST2SMS_API_KEY, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ route: 'q', message: `MTEF OTP: ${otp}`, numbers: mobile })
-        });
-        const data = await response.json();
-        if (data.return) { otpLimits[mobile]++; res.json({ success: true, message: "OTP Sent!" }); } 
-        else { res.json({ success: false, message: "Fast2SMS Error" }); }
-    } catch (e) { res.json({ success: false, message: "Server Error" }); }
-});
-
-// 📝 NORMAL REGISTRATION (WITH OTP)
 app.post('/api/register', async (req, res) => {
-    const { fullName, mobile, password, accountType, otp } = req.body;
-    if (tempOTPs[mobile] != otp) return res.json({ success: false, message: 'Invalid OTP!' });
-    
+    const { fullName, mobile, password, accountType } = req.body;
     const randomDigits = Math.floor(1000 + Math.random() * 9000);
     const userId = accountType === 'Agent' ? `MTEF${randomDigits}` : `MTEF@${randomDigits}`;
-
     const Model = accountType === 'Agent' ? Agent : Customer;
     await new Model({ fullName, mobile, password, accountType, userId }).save();
-    delete tempOTPs[mobile];
-    res.json({ success: true, message: `Registration Done! Your ID is ${userId}` });
+    res.json({ success: true, message: `Registration Done! ID: ${userId}` });
 });
 
-// 👑 ADMIN BYPASS REGISTRATION (NO OTP)
 app.post('/api/admin/create-user', async (req, res) => {
     try {
         const { fullName, mobile, password, accountType } = req.body;
-        
-        // Check agar number pehle se registered hai
-        const existingAgent = await Agent.findOne({ mobile });
-        const existingCustomer = await Customer.findOne({ mobile });
-        if (existingAgent || existingCustomer) return res.json({ success: false, message: 'This Mobile Number is already registered!' });
-
+        const exists = await Customer.findOne({ mobile }) || await Agent.findOne({ mobile });
+        if (exists) return res.json({ success: false, message: 'Mobile already registered!' });
         const randomDigits = Math.floor(1000 + Math.random() * 9000);
         const userId = accountType === 'Agent' ? `MTEF${randomDigits}` : `MTEF@${randomDigits}`;
-
         const Model = accountType === 'Agent' ? Agent : Customer;
         await new Model({ fullName, mobile, password, accountType, userId }).save();
-        
         res.json({ success: true, message: `Account Created! ID: ${userId}` });
-    } catch (err) {
-        res.json({ success: false, message: 'Server Error: ' + err.message });
-    }
+    } catch (err) { res.json({ success: false, message: 'Server Error' }); }
 });
 
-// 🔐 LOGIN API
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    if (email === "MTEF@0580" && password === "Aarav@divyansh@0580") {
-        return res.json({ success: true, redirectUrl: 'admin_dashboard.html', isAdmin: true });
-    }
+    if (email === "MTEF@0580" && password === "Aarav@divyansh@0580") return res.json({ success: true, redirectUrl: 'admin_dashboard.html', isAdmin: true });
+    
     const agent = await Agent.findOne({ mobile: email, password });
     const customer = await Customer.findOne({ mobile: email, password });
     
-    if (agent) return res.json({ success: true, redirectUrl: 'agent.html', isAdmin: false, userName: agent.fullName, userId: agent.userId || "MTEF0000" });
-    if (customer) return res.json({ success: true, redirectUrl: 'customer.html', isAdmin: false, userName: customer.fullName, userId: customer.userId || "MTEF@0000" });
-    
+    if (agent) return res.json({ success: true, redirectUrl: 'agent.html', isAdmin: false, userName: agent.fullName, userId: agent.userId, mobile: agent.mobile });
+    if (customer) return res.json({ success: true, redirectUrl: 'customer.html', isAdmin: false, userName: customer.fullName, userId: customer.userId, mobile: customer.mobile });
     res.json({ success: false, message: 'Invalid Credentials!' });
+});
+
+// 👑 ADMIN API: Update Customer Project
+app.post('/api/admin/update-project', async (req, res) => {
+    const { mobile, progress, advancePaid, balanceDue, dueDate, statusText, serviceName } = req.body;
+    await Customer.findOneAndUpdate({ mobile }, { projectData: { progress, advancePaid, balanceDue, dueDate, statusText, serviceName } });
+    res.json({ success: true, message: "Project Data Updated Live!" });
+});
+
+// 🔄 GET FRESH USER DATA (For Live Refresh)
+app.post('/api/get-user', async (req, res) => {
+    const { mobile, type } = req.body;
+    const Model = type === 'Agent' ? Agent : Customer;
+    const user = await Model.findOne({ mobile });
+    if(user) res.json({ success: true, user }); else res.json({ success: false });
+});
+
+// 🔑 CUSTOMER PASSWORD CHANGE API
+app.post('/api/change-password', async (req, res) => {
+    const { mobile, oldPass, newPass } = req.body;
+    const user = await Customer.findOne({ mobile, password: oldPass });
+    if(!user) return res.json({ success: false, message: "Incorrect Old Password!" });
+    user.password = newPass;
+    await user.save();
+    res.json({ success: true, message: "Password Changed Successfully!" });
 });
 
 app.get('/api/admin/all-data', async (req, res) => {
     const agents = await Agent.find({});
     const customers = await Customer.find({});
     res.json({ agents, customers });
-});
-
-app.post('/api/add-bank', async (req, res) => {
-    const { email, bankName, accHolder, accNumber, ifsc } = req.body;
-    await Agent.findOneAndUpdate({ mobile: email }, { bankDetails: { bankName, accHolder, accNumber, ifsc } });
-    res.json({ success: true, message: "Bank Details Updated!" });
 });
 
 const PORT = process.env.PORT || 10000;

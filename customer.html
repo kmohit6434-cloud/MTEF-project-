@@ -3,467 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Portal - MTEF</title>
+    <title>Client Dashboard - MTEF</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Inter', sans-serif; padding-bottom: 80px; overflow-x: hidden; }
-        
-        /* SPA Pages Setup */
-        .page { display: none; width: 100%; min-height: 100vh; animation: fadeIn 0.3s ease; box-sizing: border-box; }
+        body { margin: 0; background-color: #0b0f19; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 80px; }
+        .page { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Reusable UI Components */
-        .card { background-color: #121826; border-radius: 16px; border: 1px solid #1e293b; padding: 20px; box-sizing: border-box; margin-bottom: 15px; }
-        .input-group { margin-bottom: 15px; width: 100%; }
-        .input-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .input-group input, .input-group select { width: 100%; background-color: #0b0f19; border: 1px solid #1e293b; color: #fff; padding: 14px; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        .btn-main { width: 100%; background-color: #f5b041; color: #000; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-main:hover { opacity: 0.9; }
+        /* HEADER (Screenshot 28471 style) */
+        .main-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #1e293b; margin-bottom: 20px; }
+        .avatar-circle { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #3498db; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; color: #3498db; background: rgba(52,152,219,0.1); }
+        .header-text h2 { margin: 0; font-size: 18px; font-weight: 700; }
+        .header-text p { margin: 2px 0 0 0; font-size: 10px; color: #3498db; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* CARDS */
+        .card { background-color: #121826; border-radius: 16px; border: 1px solid #1e293b; padding: 20px; margin-bottom: 15px; }
+        .card-green { border-color: #2ecc71; }
+        .card-yellow { border-color: #f5b041; }
         
-        /* Header & Profile Styles */
-        .main-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; position: sticky; top: 0; background-color: #0b0f19; z-index: 100; }
-        .welcome-text h1 { margin: 0; font-size: 22px; font-weight: 700; }
-        .welcome-text p { margin: 4px 0 0 0; font-size: 12px; color: #2ecc71; font-weight: bold; background: rgba(46,204,113,0.1); padding: 2px 8px; border-radius: 4px; display: inline-block; letter-spacing: 0.5px; }
-        .header-icons { display: flex; gap: 15px; align-items: center; }
-        .icon-circle { width: 40px; height: 40px; border-radius: 50%; background-color: #121826; border: 1px solid #1e293b; display: flex; justify-content: center; align-items: center; color: #64748b; cursor: pointer; font-size: 18px; }
-        .avatar-circle { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #3498db; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: bold; color: #3498db; background: rgba(52,152,219,0.1); cursor: pointer; text-transform: uppercase; }
-
-        /* Dashboard Banner */
-        .banner-card { background: linear-gradient(135deg, #1e293b 0%, #121826 100%); display: flex; justify-content: space-between; align-items: center; overflow: hidden; padding: 0 20px; height: 120px; }
-        .banner-text h2 { margin: 0; font-size: 18px; color: #fff; }
-        .banner-text p { margin: 5px 0 0 0; font-size: 12px; color: #94a3b8; }
-        .banner-img { height: 100%; opacity: 0.6; padding-top: 20px; box-sizing: border-box; }
-
-        /* Action Grid */
-        .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 15px; margin-top: 15px; }
-        .action-card { border-radius: 16px; padding: 20px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; height: 120px; cursor: pointer; border: 1px solid; transition: 0.2s; }
-        .action-card:hover { transform: translateY(-3px); }
-        .action-card i { font-size: 24px; }
-        .action-card h3 { margin: 10px 0 0 0; font-size: 16px; font-weight: 600; color: #fff; }
-        .action-card p { margin: 2px 0 0 0; font-size: 11px; }
-
-        /* Color Variants */
-        .status-card { background-color: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.3); color: #2ecc71; }
-        .pay-card { background-color: rgba(52, 152, 219, 0.1); border-color: rgba(52, 152, 219, 0.3); color: #3498db; }
-        .due-card { background-color: rgba(231, 76, 60, 0.1); border-color: rgba(231, 76, 60, 0.3); color: #e74c3c; }
-        .req-card { background-color: rgba(245, 176, 65, 0.1); border-color: rgba(245, 176, 65, 0.3); color: #f5b041; }
-
-        /* Quick Actions List */
-        .list-section { padding: 15px; margin-top: 10px; }
-        .list-item { background-color: #121826; border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border: 1px solid #1e293b; cursor: pointer; transition: 0.2s; }
-        .list-item:hover { border-color: #3498db; }
-        .list-left { display: flex; align-items: center; gap: 15px; }
-        .list-icon { width: 35px; text-align: center; font-size: 18px; }
-        .list-text h4 { margin: 0; font-size: 14px; color: #fff; font-weight: 500; }
-        .list-right { color: #64748b; font-size: 14px; }
-
-        /* Pay Fee & Add Payment Styles */
-        .sub-header { display: flex; align-items: center; padding: 15px; gap: 15px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background-color: #0b0f19; z-index: 10; }
-        .back-btn { font-size: 18px; color: #fff; cursor: pointer; }
-        .sub-header h2 { margin: 0; font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        /* PROGRESS BAR */
+        .progress-bar-bg { background: #1e293b; height: 8px; border-radius: 4px; margin: 15px 0 10px 0; overflow: hidden; }
+        .progress-bar-fill { background: #2ecc71; height: 100%; transition: width 1s ease; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
         
-        .amount-display { text-align: center; margin: 30px 0; }
-        .amount-display p { font-size: 12px; color: #94a3b8; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
-        .amount-display h1 { font-size: 48px; margin: 0; color: #fff; font-weight: 700; }
-        .amount-display h1 span { color: #f5b041; margin-right: 10px; }
-
-        .payment-methods { margin-top: 25px; }
-        .payment-methods label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
-        .method-item { display: flex; align-items: center; padding: 15px; border-radius: 8px; background-color: #121826; border: 1px solid #1e293b; margin-bottom: 10px; cursor: pointer; }
-        .method-item.active { border-color: #3498db; background-color: rgba(52, 152, 219, 0.05); }
-        .method-icon { width: 30px; text-align: center; font-size: 18px; color: #3498db; margin-right: 15px; }
-        .method-text { flex: 1; font-size: 14px; }
-        .radio-circle { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #3e4b6e; position: relative; }
-        .method-item.active .radio-circle { border-color: #3498db; }
-        .method-item.active .radio-circle::after { content: ''; width: 10px; height: 10px; background-color: #3498db; border-radius: 50%; position: absolute; top: 4px; left: 4px; }
-
-        /* Query / Support Styles */
-        .support-tabs { display: flex; padding: 0 15px; border-bottom: 1px solid #1e293b; }
-        .support-tab { padding: 15px 10px; font-size: 14px; color: #64748b; font-weight: 500; cursor: pointer; position: relative; }
-        .support-tab.active { color: #fff; }
-        .support-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background-color: #3498db; }
-
-        .support-item-styled { display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #1e293b; padding: 20px 0; }
-        .styled-icon-box { width: 45px; height: 45px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 16px; text-transform: uppercase; flex-shrink: 0; }
-        .support-text h4 { margin: 0 0 4px 0; font-size: 15px; }
-        .support-text p { margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.4; }
-
-        /* Profile Styles */
-        .profile-hero { text-align: center; padding: 30px 15px; border-bottom: 1px solid #1e293b; }
-        .avatar-large { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #f5b041; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: bold; color: #f5b041; background: rgba(245, 176, 65, 0.1); margin: 0 auto 15px auto; text-transform: uppercase; }
-        .profile-hero h2 { margin: 0 0 5px 0; font-size: 20px; font-weight: 700; }
-        .profile-hero p { margin: 0; font-size: 12px; color: #64748b; }
-
-        /* Bottom Navigation */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: #0b0f19; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; z-index: 100; padding-bottom: 10px; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #64748b; text-decoration: none; font-size: 11px; cursor: pointer; transition: 0.2s; width: 60px; }
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background-color: #0b0f19; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #64748b; font-size: 10px; cursor: pointer; width: 60px; }
         .nav-item i { font-size: 20px; }
-        .nav-item.active { color: #f5b041; }
+        .nav-item.active { color: #2ecc71; }
+
+        /* INVOICE SLIP MODAL */
+        .slip-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; z-index: 999; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        .slip-content { background: white; color: black; padding: 20px; border-radius: 8px; max-width: 400px; margin: 0 auto; font-family: monospace; }
+        
+        .btn { padding: 12px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; width: 100%; text-align: center; }
+        .list-item { background: #1a2235; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2a354f; }
+        input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #1e293b; background: #0b0f19; color: white; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div id="customer-home" class="page active">
+    <div class="page active" style="padding-top: 20px;">
         <div class="main-header">
-            <div class="welcome-text">
-                <h1>Hello <span id="cust-name-display">Customer</span>!</h1>
-                <p id="cust-id-display">MTEF@0000</p>
-            </div>
-            <div class="header-icons">
-                <div class="icon-circle"><i class="fa-solid fa-bell"></i></div>
-                <div class="avatar-circle" id="avatar-display" onclick="switchPage('page-profile')">CU</div>
-            </div>
-        </div>
-
-        <div style="padding: 0 15px;">
-            <div class="card banner-card">
-                <div class="banner-text">
-                    <h2>Welcome to MTEF Portal</h2>
-                    <p>Manage your account seamlessly.</p>
-                </div>
-                <div class="banner-img">
-                    <i class="fa-solid fa-laptop-code" style="font-size: 70px; color: #3e4b6e;"></i>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="avatar-circle" id="user-avatar">CU</div>
+                <div class="header-text">
+                    <h2>My Project</h2>
+                    <p>CLIENT DASHBOARD | MTEF</p>
                 </div>
             </div>
+            <i class="fa-solid fa-power-off" style="color:#e74c3c; font-size:20px;" onclick="logout()"></i>
         </div>
 
-        <div class="action-grid">
-            <div class="action-card status-card">
-                <i class="fa-solid fa-circle-check"></i>
-                <h3>Status</h3>
-                <p>Verified Student</p>
+        <div id="page-project" class="page-content active">
+            <p style="color: #94a3b8; font-size: 14px; margin-top: -10px;">Hello, <span id="display-name" style="color: white; font-weight: bold;">Loading...</span></p>
+
+            <div class="card card-green">
+                <div style="font-size: 11px; color: #94a3b8; letter-spacing: 1px;">CURRENT STATUS</div>
+                <div style="font-size: 24px; font-weight: bold; color: #2ecc71; margin-top: 5px;" id="dyn-status">Loading...</div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="dyn-bar" style="width: 0%;"></div></div>
+                <div class="flex-between" style="font-size: 11px; color: #64748b;">
+                    <span>Started</span>
+                    <span style="color: #2ecc71; font-weight: bold;" id="dyn-perc">0% COMPLETED</span>
+                    <span>Go Live</span>
+                </div>
             </div>
-            <div class="action-card pay-card" onclick="switchPage('page-pay-fee')">
-                <i class="fa-solid fa-money-bill-wave"></i>
-                <h3>Pay Fee</h3>
-                <p>₹2100 Due</p>
+
+            <div style="display: flex; gap: 15px;">
+                <div class="card card-blue" style="flex: 1;">
+                    <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase;">Advance Paid</div>
+                    <div style="font-size: 22px; font-weight: bold; margin-top: 5px;">₹<span id="dyn-adv">0</span></div>
+                </div>
+                <div class="card card-yellow" style="flex: 1;">
+                    <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase;">Balance Due</div>
+                    <div style="font-size: 22px; font-weight: bold; margin-top: 5px; color: #f5b041;">₹<span id="dyn-bal">0</span></div>
+                </div>
             </div>
-            <div class="action-card due-card">
-                <i class="fa-solid fa-calendar-xmark"></i>
-                <h3>Due Date</h3>
-                <p>15 May 2026</p>
-            </div>
-            <div class="action-card req-card">
-                <i class="fa-solid fa-clipboard-list"></i>
-                <h3>Service Requests</h3>
-                <p>No active request</p>
+
+            <div class="card">
+                <div style="font-size: 12px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; margin-bottom: 15px; border-bottom: 1px solid #1e293b; padding-bottom: 10px;">PLAN DETAILS</div>
+                <div class="flex-between" style="margin-bottom: 15px;">
+                    <span style="color: #64748b; font-size: 13px;">Selected Service</span>
+                    <span style="font-weight: bold; font-size: 13px;" id="dyn-service">Website / App</span>
+                </div>
+                <div class="flex-between">
+                    <span style="color: #64748b; font-size: 13px;">Delivery Date</span>
+                    <span style="color: #3498db; font-weight: bold; font-size: 13px;" id="dyn-date">Under Process</span>
+                </div>
             </div>
         </div>
 
-        <div class="list-section">
-            <h3 style="font-size: 16px; margin: 0 0 15px 0;">Quick Actions</h3>
+        <div id="page-invoices" class="page-content" style="display: none;">
+            <h3 style="color: #3498db; margin-top: 0; border-bottom: 1px solid #3498db; padding-bottom: 10px;"><i class="fa-solid fa-file-invoice-dollar"></i> MY INVOICES & PAYMENTS</h3>
             
-            <div class="list-item" onclick="handleGetSlips()">
-                <div class="list-left">
-                    <div class="list-icon" style="color: #2ecc71;"><i class="fa-solid fa-file-invoice"></i></div>
-                    <div class="list-text"><h4>Get Slips</h4></div>
-                </div>
-                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <button class="btn" style="flex: 1; background: rgba(46,204,113,0.1); color: #2ecc71; border: 1px solid #2ecc71;" onclick="processPayment()"><i class="fa-solid fa-wallet"></i> Pay Fee</button>
+                <button class="btn" style="flex: 1; background: rgba(52,152,219,0.1); color: #3498db; border: 1px solid #3498db;" onclick="generateSlip()"><i class="fa-solid fa-download"></i> Get Slips</button>
             </div>
 
-            <div class="list-item" onclick="switchPage('page-add-payment')">
-                <div class="list-left">
-                    <div class="list-icon" style="color: #3498db;"><i class="fa-solid fa-plus-circle"></i></div>
-                    <div class="list-text"><h4>Add Payment</h4></div>
+            <div class="card card-green" style="position: relative; overflow: hidden;">
+                <i class="fa-solid fa-check-circle" style="position: absolute; top: -10px; right: -10px; font-size: 80px; opacity: 0.05; color: #2ecc71;"></i>
+                <div class="flex-between">
+                    <div>
+                        <h3 style="margin: 0;">Advance Payment</h3>
+                        <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">INV-2026-001</p>
+                    </div>
+                    <h2 style="margin: 0;">₹<span id="inv-adv">0</span></h2>
                 </div>
-                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="flex-between" style="margin-top: 20px;">
+                    <span style="font-size: 11px; color: #94a3b8;"><i class="fa-regular fa-calendar"></i> Verified</span>
+                    <span style="background: #2ecc71; color: #000; font-size: 10px; padding: 2px 10px; border-radius: 10px; font-weight: bold;">PAID</span>
+                </div>
             </div>
 
-            <div class="list-item" onclick="switchPage('page-support')">
-                <div class="list-left">
-                    <div class="list-icon" style="color: #f5b041;"><i class="fa-solid fa-headset"></i></div>
-                    <div class="list-text"><h4>Query / Support</h4></div>
+            <div class="card card-yellow" style="position: relative; overflow: hidden;">
+                <i class="fa-solid fa-circle-exclamation" style="position: absolute; top: -10px; right: -10px; font-size: 80px; opacity: 0.05; color: #f5b041;"></i>
+                <div class="flex-between">
+                    <div>
+                        <h3 style="margin: 0;">Final Settlement</h3>
+                        <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Pending Generation</p>
+                    </div>
+                    <h2 style="margin: 0; color: #f5b041;">₹<span id="inv-bal">0</span></h2>
                 </div>
-                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
-            </div>
-
-            <div class="list-item" onclick="switchPage('page-profile')">
-                <div class="list-left">
-                    <div class="list-icon" style="color: #e74c3c;"><i class="fa-solid fa-user-gear"></i></div>
-                    <div class="list-text"><h4>Profile</h4></div>
+                <div class="flex-between" style="margin-top: 20px;">
+                    <span style="font-size: 11px; color: #94a3b8;"><i class="fa-regular fa-clock"></i> Due before Go-Live</span>
+                    <span style="background: transparent; border: 1px solid #f5b041; color: #f5b041; font-size: 10px; padding: 2px 10px; border-radius: 10px; font-weight: bold;">PENDING</span>
                 </div>
-                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
             </div>
         </div>
-    </div>
 
-    <div id="page-pay-fee" class="page">
-        <div class="sub-header">
-            <i class="fa-solid fa-arrow-left back-btn" onclick="switchPage('customer-home')"></i>
-            <h2>Pay Fee</h2>
-        </div>
-        <div style="padding: 15px;">
-            <div class="card amount-display">
-                <p>Total Payable Fee</p>
-                <h1><span>₹</span>2,100</h1>
-            </div>
+        <div id="page-guidelines" class="page-content" style="display: none;">
+            <h3 style="color: #f5b041; margin-top: 0; border-bottom: 1px solid #f5b041; padding-bottom: 10px;"><i class="fa-solid fa-book-open"></i> MTEF GUIDELINES</h3>
+            
             <div class="card">
-                <div class="input-group">
-                    <label>Select Course/Service</label>
-                    <select id="pay-service">
-                        <option>App Development Course</option>
-                        <option>Digital Marketing Service</option>
-                    </select>
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div style="width: 30px; height: 30px; border-radius: 50%; background: rgba(46,204,113,0.1); color: #2ecc71; display: flex; justify-content: center; align-items: center;"><i class="fa-solid fa-bolt"></i></div>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0;">Fast & Secure Delivery</h4>
+                        <p style="margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.5;">Aapka project hamari priority hai. Ise tay samay (deadline) se pehle aur top quality ke sath pura kiya jayega.</p>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>Enter Amount to Pay (₹)</label>
-                    <input type="number" id="pay-amount" placeholder="e.g. 2100" value="2100">
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div style="width: 30px; height: 30px; border-radius: 50%; background: rgba(52,152,219,0.1); color: #3498db; display: flex; justify-content: center; align-items: center;"><i class="fa-brands fa-whatsapp"></i></div>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0;">WhatsApp Support Only</h4>
+                        <p style="margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.5;">Kisi bhi samasya ya update ke liye sirf niche diye 'Support' button par click karke Admin ko WhatsApp message karein.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="payment-methods">
-                <label>Select Payment Method</label>
-                <div class="method-item active" onclick="selectPayment(this)">
-                    <div class="method-icon"><i class="fa-brands fa-google-pay"></i></div>
-                    <div class="method-text">UPI / Google Pay / PhonePe</div>
-                    <div class="radio-circle"></div>
-                </div>
-                <div class="method-item" onclick="selectPayment(this)">
-                    <div class="method-icon"><i class="fa-solid fa-building-columns"></i></div>
-                    <div class="method-text">Net Banking</div>
-                    <div class="radio-circle"></div>
-                </div>
-                <div class="method-item" onclick="selectPayment(this)">
-                    <div class="method-icon"><i class="fa-solid fa-credit-card"></i></div>
-                    <div class="method-text">Credit / Debit Card</div>
-                    <div class="radio-circle"></div>
+                <div style="display: flex; gap: 15px;">
+                    <div style="width: 30px; height: 30px; border-radius: 50%; background: rgba(245,176,65,0.1); color: #f5b041; display: flex; justify-content: center; align-items: center;">Rs</div>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0;">Payment Policy</h4>
+                        <p style="margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.5;">Project shuru karne ke liye Advance anivarya hai. Bacha hua payment project 'Live' hone se thik pehle clear karna hoga.</p>
+                    </div>
                 </div>
             </div>
-            <button class="btn-main" style="margin-top: 30px;" onclick="processFeePayment()">
-                <i class="fa-solid fa-lock"></i> Pay ₹<span id="pay-btn-amount">2100</span> Now
-            </button>
-        </div>
-    </div>
 
-    <div id="page-support" class="page">
-        <div class="sub-header">
-            <i class="fa-solid fa-arrow-left back-btn" onclick="switchPage('customer-home')"></i>
-            <h2>QUERY / SUPPORT</h2>
-        </div>
-        <div class="support-tabs">
-            <div class="support-tab active">Support Teams</div>
-            <div class="support-tab" onclick="alert('Chat with Admin Coming Soon!')">Chat Admin</div>
-        </div>
-        <div style="padding: 0 20px;">
-            <div class="support-item-styled">
-                <div class="styled-icon-box" style="background:#2a354f; color:#8b5cf6;">Dl</div>
-                <div class="support-text">
-                    <h4>DLT SMS Technical</h4>
-                    <p>Issues regarding bulk SMS, DLT entity registration, template approval, or API integration.</p>
-                </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="font-weight: bold; margin-bottom: 10px;">Need Assistance?</p>
+                <button class="btn" style="background: #25D366; color: white;" onclick="window.open('https://wa.me/91XXXXXXXXXX', '_blank')"><i class="fa-brands fa-whatsapp"></i> WhatsApp Support</button>
             </div>
-            <div class="support-item-styled">
-                <div class="styled-icon-box" style="background:#2a354f; color:#10b981;">Fa</div>
-                <div class="support-text">
-                    <h4>Fast2SMS Technical</h4>
-                    <p>API connection, wallet balance issues, sender ID, or routing queries (Quick/Transactional).</p>
-                </div>
-            </div>
-            <div class="support-item-styled" style="border-bottom: none;">
-                <div class="styled-icon-box" style="background:#2a354f; color:#3b82f6;">PG</div>
-                <div class="support-text">
-                    <h4>Payment Gateway</h4>
-                    <p>Regarding fee payment failures, wallet add money issues, and payment reconciliation.</p>
-                </div>
-            </div>
-            <button class="btn-main btn-whatsapp" style="background-color: #25D366; color: #fff; margin-top: 30px;" onclick="window.open('https://wa.me/91XXXXXXXXXX', '_blank')">
-                <i class="fa-brands fa-whatsapp"></i> Message Admin on WhatsApp
-            </button>
         </div>
-    </div>
 
-    <div id="page-profile" class="page">
-        <div class="sub-header">
-            <i class="fa-solid fa-arrow-left back-btn" onclick="switchPage('customer-home')"></i>
-            <h2>PROFILE</h2>
-        </div>
-        <div class="profile-hero">
-            <div class="avatar-large" id="profile-avatar-display">CU</div>
-            <h2 id="profile-name-display">Customer</h2>
-            <p id="profile-email-display">client@mtef.com</p>
-            <p id="profile-mobile-display">No Mobile</p>
-        </div>
-        <div class="list-section">
-            <div class="list-item" onclick="alert('Feature Coming Soon')">
-                <div class="list-left">
-                    <div class="list-icon" style="color: #64748b;"><i class="fa-solid fa-user-edit"></i></div>
-                    <div class="list-text"><h4>Edit Profile</h4></div>
+        <div id="page-settings" class="page-content" style="display: none;">
+            <h3 style="color: #fff; margin-top: 0; border-bottom: 1px solid #1e293b; padding-bottom: 10px;"><i class="fa-solid fa-gear"></i> ACCOUNT SETTINGS</h3>
+            
+            <div class="card" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                <div class="avatar-circle" id="set-avatar" style="width: 60px; height: 60px; font-size: 24px; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; border: none;">CU</div>
+                <div>
+                    <h3 style="margin: 0 0 5px 0;" id="set-name">Customer</h3>
+                    <p style="margin: 0; font-size: 11px; color: #94a3b8;">MTEF Verified Client <i class="fa-solid fa-circle-check" style="color: #3498db;"></i></p>
+                    <p style="margin: 2px 0 0 0; font-size: 11px; color: #f5b041;" id="set-id">MTEF@0000</p>
                 </div>
-                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
             </div>
-            <div class="list-item" onclick="alert('Feature Coming Soon')">
-                <div class="list-left">
-                    <div class="list-icon" style="color: #64748b;"><i class="fa-solid fa-key"></i></div>
-                    <div class="list-text"><h4>Set New Password</h4></div>
-                </div>
-                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+
+            <div class="list-item" onclick="alert('Profile detail update feature coming soon!')">
+                <div><i class="fa-solid fa-user-edit" style="color: #3498db; width: 25px;"></i> Edit Profile</div>
+                <i class="fa-solid fa-chevron-right" style="color: #64748b;"></i>
             </div>
-            <div class="list-item" onclick="alert('Feature Coming Soon')">
-                <div class="list-left">
-                    <div class="list-icon" style="color: #64748b;"><i class="fa-solid fa-shield-alt"></i></div>
-                    <div class="list-text"><h4>Security Settings</h4></div>
-                </div>
-                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+            
+            <div class="list-item" onclick="document.getElementById('pass-div').style.display = 'block'">
+                <div><i class="fa-solid fa-key" style="color: #f5b041; width: 25px;"></i> Change Password</div>
+                <i class="fa-solid fa-chevron-right" style="color: #64748b;"></i>
             </div>
-            <div class="list-item" onclick="logout()" style="border-color: rgba(231, 76, 60, 0.3);">
-                <div class="list-left">
-                    <div class="list-icon" style="color: #e74c3c;"><i class="fa-solid fa-power-off"></i></div>
-                    <div class="list-text"><h4 style="color: #e74c3c;">Logout</h4></div>
-                </div>
+            
+            <div id="pass-div" class="card" style="display: none; border-color: #f5b041;">
+                <h4 style="margin-top: 0; color: #f5b041;">Set New Password</h4>
+                <input type="text" id="old-pass" placeholder="Enter Old Password">
+                <input type="text" id="new-pass" placeholder="Enter New Password">
+                <button class="btn" style="background: #f5b041; color: black;" onclick="updatePassword()">Update Password</button>
+            </div>
+
+            <div class="list-item" onclick="logout()" style="border: 1px solid rgba(231,76,60,0.3); margin-top: 20px;">
+                <div style="color: #e74c3c;"><i class="fa-solid fa-power-off" style="width: 25px;"></i> Secure Logout</div>
             </div>
         </div>
     </div>
 
-    <div id="page-add-payment" class="page">
-        <div class="sub-header">
-            <i class="fa-solid fa-arrow-left back-btn" onclick="switchPage('customer-home')"></i>
-            <h2>ADD PAYMENT</h2>
-        </div>
-        <div style="padding: 15px;">
-            <div class="card banner-card" style="margin-bottom: 20px;">
-                <div class="banner-text">
-                    <p style="margin: 0; color: #2ecc71;">Wallet Balance</p>
-                    <h1 style="margin: 5px 0 0 0; color: #fff; font-size: 32px;"><span>₹</span>4,500</h1>
-                </div>
-                <i class="fa-solid fa-wallet" style="font-size: 50px; color: #3e4b6e;"></i>
+    <div class="slip-modal" id="slipModal">
+        <div style="text-align: right; margin-bottom: 10px;"><i class="fa-solid fa-circle-xmark" style="font-size: 30px; color: white; cursor: pointer;" onclick="document.getElementById('slipModal').style.display='none'"></i></div>
+        <div class="slip-content">
+            <h2 style="text-align: center; border-bottom: 2px dashed #ccc; padding-bottom: 10px; margin-top: 0;">MTEF RECEIPT</h2>
+            <p><strong>Date:</strong> <span id="slip-date"></span></p>
+            <p><strong>Receipt No:</strong> INV-<span id="slip-rand"></span></p>
+            <p><strong>Billed To:</strong> <span id="slip-name"></span> (<span id="slip-id"></span>)</p>
+            <p><strong>Service:</strong> <span id="slip-service"></span></p>
+            <hr style="border: 1px dashed #ccc;">
+            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                <span>Total Amount:</span> <span>₹<span id="slip-total"></span></span>
             </div>
-            <div class="card">
-                <div class="input-group">
-                    <label>Enter Amount to Add (₹)</label>
-                    <input type="number" id="add-amount" placeholder="Min ₹100 e.g. 1000">
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: -5px;">
-                    <button class="btn-main" style="background:#1e293b; color:white; padding: 10px; font-size: 13px;" onclick="quickAdd(500)">+ 500</button>
-                    <button class="btn-main" style="background:#1e293b; color:white; padding: 10px; font-size: 13px;" onclick="quickAdd(1000)">+ 1000</button>
-                </div>
+            <div style="display: flex; justify-content: space-between; margin: 10px 0; color: green; font-weight: bold;">
+                <span>Advance Paid:</span> <span>₹<span id="slip-adv"></span></span>
             </div>
-            <div class="payment-methods">
-                <label>Select Payment Gateway</label>
-                <div class="method-item active" onclick="selectPayment(this)">
-                    <div class="method-icon"><i class="fa-solid fa-gateway"></i></div>
-                    <div class="method-text">Razorpay Gateway</div>
-                    <div class="radio-circle"></div>
-                </div>
+            <div style="display: flex; justify-content: space-between; margin: 10px 0; color: red; font-weight: bold;">
+                <span>Balance Due:</span> <span>₹<span id="slip-bal"></span></span>
             </div>
-            <button class="btn-main" style="margin-top: 30px; background-color: #3498db; color: #fff;" onclick="processAddPayment()">
-                <i class="fa-solid fa-wallet"></i> Add Money to Wallet
-            </button>
+            <hr style="border: 1px dashed #ccc;">
+            <p style="text-align: center; font-size: 12px; margin-top: 20px;">Thank you for choosing Master Tech Edu!</p>
+            <button class="btn" style="background: #3498db; color: white; margin-top: 10px;" onclick="alert('PDF Downloaded!')">Download PDF</button>
         </div>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" id="nav-home" onclick="switchPage('customer-home')">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </div>
-        <div class="nav-item" id="nav-wallet" onclick="switchPage('page-add-payment')">
-            <i class="fa-solid fa-wallet"></i>
-            <span>Wallet</span>
-        </div>
-        <div class="nav-item" id="nav-support" onclick="switchPage('page-support')">
-            <i class="fa-solid fa-headset"></i>
-            <span>Support</span>
-        </div>
-        <div class="nav-item" id="nav-profile" onclick="switchPage('page-profile')">
-            <i class="fa-solid fa-user"></i>
-            <span>Profile</span>
-        </div>
+        <div class="nav-item active" id="nav-project" onclick="navTo('project')"><i class="fa-solid fa-diagram-project"></i><span>Project</span></div>
+        <div class="nav-item" id="nav-invoices" onclick="navTo('invoices')"><i class="fa-solid fa-file-invoice-dollar"></i><span>Invoices</span></div>
+        <div class="nav-item" id="nav-guidelines" onclick="navTo('guidelines')"><i class="fa-solid fa-book-open"></i><span>Guidelines</span></div>
+        <div class="nav-item" id="nav-settings" onclick="navTo('settings')"><i class="fa-solid fa-gear"></i><span>Settings</span></div>
     </div>
 
     <script>
-        // 🛑 MASTER FIX: SECURE AUTHENTICATION 🛑
-        window.onload = function() {
-            // Check if user has an ID and is NOT an admin
-            if(localStorage.getItem('userId') && localStorage.getItem('isAdmin') !== 'true') {
-                const name = localStorage.getItem('userName') || "Customer";
-                const id = localStorage.getItem('userId') || "MTEF@0000";
-                const email = localStorage.getItem('userEmail') || "client@mtef.com";
-                const mobile = localStorage.getItem('userMobile') || "No Mobile";
+        let userData = {};
 
-                // Update Dashboard Header
-                document.getElementById('cust-name-display').innerText = name;
-                document.getElementById('cust-id-display').innerText = id;
-                
-                // Set Initials (Mohit Kumar -> MK)
-                const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
-                document.getElementById('avatar-display').innerText = initials || "CU";
-
-                // Update Profile Page
-                document.getElementById('profile-name-display').innerText = name;
-                document.getElementById('profile-avatar-display').innerText = initials || "CU";
-                document.getElementById('profile-email-display').innerText = email;
-                document.getElementById('profile-mobile-display').innerText = "+91 " + mobile;
-
-            } else {
-                window.location.href = "index.html"; 
-            }
-        }
-
-        // SPA Navigation Logic
-        function switchPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-
-            if(pageId === 'customer-home') document.getElementById('nav-home').classList.add('active');
-            else if(pageId === 'page-add-payment' || pageId === 'page-pay-fee') document.getElementById('nav-wallet').classList.add('active');
-            else if(pageId === 'page-support') document.getElementById('nav-support').classList.add('active');
-            else if(pageId === 'page-profile') document.getElementById('nav-profile').classList.add('active');
-        }
-
-        function logout() {
-            if(confirm("Are you sure you want to logout?")) {
-                localStorage.clear();
-                window.location.href = "index.html";
-            }
-        }
-
-        function selectPayment(element) {
-            element.parentElement.querySelectorAll('.method-item').forEach(m => m.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        document.getElementById('pay-amount').addEventListener('input', function() {
-            document.getElementById('pay-btn-amount').innerText = this.value || '0';
-        });
-
-        function quickAdd(amount) {
-            document.getElementById('add-amount').value = amount;
-        }
-
-        function handleGetSlips() {
-            alert("✅ Request Sent! Your account slips are being generated. You will receive a link to download them via registered Email/SMS within 15 minutes.");
-        }
-
-        function processFeePayment() {
-            const amount = document.getElementById('pay-amount').value;
-            const service = document.getElementById('pay-service').value;
-            if(!amount || amount <= 0) return alert("Please enter a valid amount.");
+        window.onload = async function() {
+            const userMobile = localStorage.getItem('mobile');
+            if(!userMobile || localStorage.getItem('isAdmin') === 'true') { window.location.href = "index.html"; return; }
             
-            if(confirm(`Proceed to pay ₹${amount} for ${service}?`)) {
-                alert(`🔄 Gateway Opening...\nNormally this would open Razorpay for ₹${amount}.`);
-                setTimeout(()=> {
-                    alert(`✅ Success!\nPayment of ₹${amount} was successful. Transaction ID: MTEF${Date.now()}`);
-                    switchPage('customer-home');
-                }, 2000);
+            // Fetch Fresh Data from Server
+            const res = await fetch('/api/get-user', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ mobile: userMobile, type: 'Customer' }) });
+            const data = await res.json();
+            
+            if(data.success) {
+                userData = data.user;
+                
+                // Clean Name (Remove bracket text if any)
+                let cleanName = userData.fullName.split('(')[0].trim();
+                let initials = cleanName.substring(0, 2).toUpperCase();
+
+                // Update Header
+                document.getElementById('user-avatar').innerText = initials;
+                document.getElementById('set-avatar').innerText = initials;
+                document.getElementById('display-name').innerText = cleanName;
+                document.getElementById('set-name').innerText = cleanName;
+                document.getElementById('set-id').innerText = userData.userId;
+                
+                // 🛑 UPDATE LIVE PROJECT DATA 🛑
+                const pd = userData.projectData;
+                document.getElementById('dyn-status').innerText = pd.statusText;
+                document.getElementById('dyn-bar').style.width = pd.progress + '%';
+                document.getElementById('dyn-perc').innerText = pd.progress + '% COMPLETED';
+                document.getElementById('dyn-adv').innerText = pd.advancePaid;
+                document.getElementById('dyn-bal').innerText = pd.balanceDue;
+                document.getElementById('dyn-service').innerText = pd.serviceName;
+                document.getElementById('dyn-date').innerText = pd.dueDate;
+
+                // Update Invoices Data
+                document.getElementById('inv-adv').innerText = pd.advancePaid;
+                document.getElementById('inv-bal').innerText = pd.balanceDue;
+
+            } else { alert("Data load failed!"); }
+        }
+
+        function navTo(page) {
+            document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + page).style.display = 'block';
+            document.getElementById('nav-' + page).classList.add('active');
+        }
+
+        async function updatePassword() {
+            const oldPass = document.getElementById('old-pass').value;
+            const newPass = document.getElementById('new-pass').value;
+            if(!oldPass || !newPass) return alert("Fill both fields!");
+            
+            const res = await fetch('/api/change-password', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ mobile: userData.mobile, oldPass, newPass }) });
+            const data = await res.json();
+            alert(data.message);
+            if(data.success) document.getElementById('pass-div').style.display = 'none';
+        }
+
+        function processPayment() {
+            if(userData.projectData.balanceDue == 0) return alert("No due balance!");
+            if(confirm(`Pay your due balance of ₹${userData.projectData.balanceDue}?`)) {
+                alert(`🔄 Opening Payment Gateway for ₹${userData.projectData.balanceDue}...`);
+                setTimeout(()=> { alert(`✅ Payment Successful!`); location.reload(); }, 2000);
             }
         }
 
-        function processAddPayment() {
-            const amount = document.getElementById('add-amount').value;
-            if(!amount || amount < 100) return alert("Min amount to add is ₹100.");
+        function generateSlip() {
+            document.getElementById('slip-date').innerText = new Date().toLocaleDateString();
+            document.getElementById('slip-rand').innerText = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('slip-name').innerText = userData.fullName.split('(')[0].trim();
+            document.getElementById('slip-id').innerText = userData.userId;
+            document.getElementById('slip-service').innerText = userData.projectData.serviceName;
+            
+            let adv = userData.projectData.advancePaid;
+            let bal = userData.projectData.balanceDue;
+            document.getElementById('slip-adv').innerText = adv;
+            document.getElementById('slip-bal').innerText = bal;
+            document.getElementById('slip-total').innerText = parseInt(adv) + parseInt(bal);
 
-            if(confirm(`Proceed to add ₹${amount} to your MTEF Wallet?`)) {
-                alert(`🔄 Gateway Opening...\nNormally this would open Razorpay for ₹${amount}.`);
-                setTimeout(()=> {
-                    alert(`✅ Added Successfully!\n₹${amount} added to your wallet. Transaction ID: MTEFW${Date.now()}`);
-                    switchPage('customer-home');
-                }, 2000);
-            }
+            document.getElementById('slipModal').style.display = 'block';
         }
+
+        function logout() { localStorage.clear(); window.location.href = "index.html"; }
     </script>
 </body>
 </html>
