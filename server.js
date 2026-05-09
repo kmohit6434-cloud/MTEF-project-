@@ -19,7 +19,7 @@ const Agent = mongoose.model('Agent', UserSchema, 'agents');
 let tempOTPs = {}; 
 let otpLimits = {}; // 🛑 3 OTP LIMIT
 
-// 📱 FAST2SMS DEFAULT OTP API (NO DLT REQUIRED)
+// 📱 FAST2SMS QUICK SMS API (NO VERIFICATION REQUIRED)
 app.post('/api/send-otp', async (req, res) => {
     const { mobile } = req.body;
     
@@ -32,13 +32,13 @@ app.post('/api/send-otp', async (req, res) => {
     tempOTPs[mobile] = otp; 
     
     try {
-        // Yaha hum route 'q' ki jagah 'otp' use kar rahe hain (Fast2SMS ka pre-approved DLT)
+        // Yahan hum 'q' (Quick) route use kar rahe hain
         const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
             method: 'POST',
             headers: { 'authorization': process.env.FAST2SMS_API_KEY, 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                route: 'otp', 
-                variables_values: otp.toString(), 
+                route: 'q', 
+                message: `Welcome to MTEF! Your Registration OTP is: ${otp}`, 
                 numbers: mobile 
             })
         });
