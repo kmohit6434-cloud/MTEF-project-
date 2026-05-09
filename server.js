@@ -16,11 +16,55 @@ const UserSchema = new mongoose.Schema({
 const Customer = mongoose.model('Customer', UserSchema, 'customers');
 const Agent = mongoose.model('Agent', UserSchema, 'agents');
 
+let tempOTPs = {}; 
+let otpLimits = {}; // 🛑 3 OTP LIMIT
+
+// 📱 FAST2SMS DEFAULT OTP API (NO DLT REQUIRED)
+app.post('/api/send-otp', async (req, res) => {
+    const { mobile } = req.body;
+    
+    if (!otpLimits[mobile]) otpLimits[mobile] = 0;
+    if (otpLimits[mobile] >= 3) {
+        return res.json({ success: false, message: "Limit Exceeded! Maximum 3 OTPs allowed." });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    tempOTPs[mobile] = otp; 
+    
+    try {
+        // Yaha hum route 'q' ki jagah 'otp' use kar rahe hain (Fast2SMS ka pre-approved DLT)
+        const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+            method: 'POST',
+            headers: { 'authorization': process.env.FAST2SMS_API_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                route: 'otp', 
+                variables_values: otp.toString(), 
+                numbers: mobile 
+            })
+        });
+        const data = await response.json();
+        
+        if (data.return) {
+            otpLimits[mobile]++; 
+            res.json({ success: true, message: `OTP Sent Successfully! (Attempt ${otpLimits[mobile]}/3)` });
+        } else {
+            console.log("Fast2SMS Error:", data);
+            res.json({ success: false, message: "Fast2SMS Error! Please try again." });
+        }
+    } catch (e) { res.json({ success: false, message: "Server Error" }); }
+});
+
+// 📝 REGISTRATION API
 app.post('/api/register', async (req, res) => {
     try {
-        const { fullName, email, mobile, password, accountType } = req.body;
+        const { fullName, email, mobile, password, accountType, otp } = req.body;
+        if (tempOTPs[mobile] != otp) return res.json({ success: false, message: 'Invalid OTP!' });
+        
         const Model = accountType === 'Agent' ? Agent : Customer;
         await new Model({ fullName, email: email || "", mobile, password, accountType }).save();
+        
+        delete tempOTPs[mobile]; 
+        delete otpLimits[mobile]; 
         res.json({ success: true, message: 'Registration Successful! Data Saved.' });
     } catch (err) {
         res.json({ success: false, message: "Database Error: " + err.message });
