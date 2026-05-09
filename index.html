@@ -17,22 +17,19 @@
 </head>
 <body>
     <div class="box">
-        
         <div id="login-section">
             <h2 style="text-align:center; color:#f5b041;">MTEF LOGIN</h2>
             <input type="text" id="email" placeholder="Mobile / Admin ID">
             <input type="password" id="password" placeholder="Password">
             <button onclick="login()">Login</button>
-            <div style="text-align:center; margin-top:10px;">
-                <a href="#" onclick="showSection('forgot-section')" style="color:#3498db; font-size:13px; text-decoration:none;">Forgot Password?</a>
-            </div>
+            <div style="text-align:center; margin-top:10px;"><a href="#" onclick="showSection('forgot-section')" style="color:#3498db; font-size:13px; text-decoration:none;">Forgot Password?</a></div>
             <p style="text-align:center; font-size:14px; color:#94a3b8;">No account? <a href="register.html" style="color:#f5b041; text-decoration:none;">Register</a></p>
         </div>
 
         <div id="forgot-section" style="display:none; text-align:center;">
             <h2 style="color:#3498db; margin-bottom:10px;">Reset Password</h2>
-            <p style="font-size:12px; color:#94a3b8; margin-top:0;">Enter your registered Mobile or Email</p>
-            <input type="text" id="reset-id" placeholder="Mobile Number or Email ID">
+            <p style="font-size:12px; color:#94a3b8; margin-top:0;">Enter your registered Mobile</p>
+            <input type="text" id="reset-id" placeholder="Mobile Number">
             <button onclick="submitForgot()" style="background-color:#3498db; color:white;">Submit Request</button>
             <p style="margin-top:15px; font-size:13px;"><a href="#" onclick="showSection('login-section')" style="color:#94a3b8; text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> Back to Login</a></p>
         </div>
@@ -40,14 +37,9 @@
         <div id="success-msg" style="display:none; text-align:center;">
             <i class="fa-solid fa-circle-check" style="color:#2ecc71; font-size:50px; margin-bottom:15px;"></i>
             <h2 style="color:#2ecc71; margin:0 0 10px 0;">Thank you</h2>
-            <p style="font-size:15px; color:#cbd5e1; line-height:1.6;">
-                Your request has been sent MTEF team<br>
-                Your password send email ✉️<br>
-                And sms box
-            </p>
+            <p style="font-size:15px; color:#cbd5e1; line-height:1.6;">Your request has been sent MTEF team<br>Your password send email ✉️<br>And sms box</p>
             <button onclick="showSection('login-section')" style="margin-top:20px; background-color:#1e293b; color:white;">Go Back</button>
         </div>
-
     </div>
 
     <script>
@@ -57,32 +49,21 @@
             document.getElementById('success-msg').style.display = 'none';
             document.getElementById(id).style.display = 'block';
         }
-
-        function submitForgot() {
-            const resetId = document.getElementById('reset-id').value;
-            if(!resetId) {
-                alert("Please enter your Mobile Number or Email!");
-            } else {
-                // Submit hone ke baad aapka message dikhayega
-                showSection('success-msg');
-            }
-        }
+        function submitForgot() { document.getElementById('reset-id').value ? showSection('success-msg') : alert("Enter Mobile Number!"); }
 
         async function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const res = await fetch('/api/login', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email, password })
-            });
+            const res = await fetch('/api/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, password }) });
             const data = await res.json();
             if(data.success) {
                 localStorage.setItem('userEmail', email);
-                if(data.isAdmin) {
-                    localStorage.setItem('isAdmin', 'true');
-                } else {
-                    localStorage.removeItem('isAdmin');
-                }
+                
+                // 🛑 YAHAN HUM NAAM AUR ID SAVE KAR RAHE HAIN 🛑
+                if(data.userName) localStorage.setItem('userName', data.userName);
+                if(data.userId) localStorage.setItem('userId', data.userId);
+
+                if(data.isAdmin) { localStorage.setItem('isAdmin', 'true'); } else { localStorage.removeItem('isAdmin'); }
                 window.location.href = data.redirectUrl;
             } else { alert(data.message); }
         }

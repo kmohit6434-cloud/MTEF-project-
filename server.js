@@ -9,8 +9,10 @@ app.use(express.static('./'));
 const mongoURI = process.env.MONGODB_URI;
 mongoose.connect(mongoURI).then(() => console.log('✅ Connected to MongoDB')).catch(e => console.log(e));
 
+// 🛑 SCHEMA UPDATED: userId added
 const UserSchema = new mongoose.Schema({
     fullName: String, mobile: String, password: String, accountType: String,
+    userId: String, // Ye nayi ID ke liye hai
     bankDetails: { bankName: String, accHolder: String, accNumber: String, ifsc: String }
 });
 const Customer = mongoose.model('Customer', UserSchema, 'customers');
@@ -19,7 +21,6 @@ const Agent = mongoose.model('Agent', UserSchema, 'agents');
 let tempOTPs = {}; 
 let otpLimits = {};
 
-// 📱 MOBILE OTP API
 app.post('/api/send-otp', async (req, res) => {
     const { mobile } = req.body;
     if (!otpLimits[mobile]) otpLimits[mobile] = 0;
@@ -42,21 +43,25 @@ app.post('/api/send-otp', async (req, res) => {
     } catch (e) { res.json({ success: false, message: "Server Error" }); }
 });
 
-// 📝 REGISTRATION API
+// 📝 REGISTRATION API (With ID Generator)
 app.post('/api/register', async (req, res) => {
     const { fullName, mobile, password, accountType, otp } = req.body;
     if (tempOTPs[mobile] != otp) return res.json({ success: false, message: 'Invalid OTP!' });
+    
+    // 🛑 GENERATE UNIQUE ID
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
+    const userId = accountType === 'Agent' ? `MTEF${randomDigits}` : `MTEF@${randomDigits}`;
+
     const Model = accountType === 'Agent' ? Agent : Customer;
-    await new Model({ fullName, mobile, password, accountType }).save();
+    await new Model({ fullName, mobile, password, accountType, userId }).save();
     delete tempOTPs[mobile];
-    res.json({ success: true, message: 'Registration Done!' });
+    res.json({ success: true, message: `Registration Done! Your ID is ${userId}` });
 });
 
-// 🔐 MASTER ADMIN LOGIN FIX
+// 🔐 LOGIN API (Returns Name and ID)
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
-    // Nayi Admin ID aur Password
     if (email === "MTEF@0580" && password === "Aarav@divyansh@0580") {
         return res.json({ success: true, redirectUrl: 'admin_dashboard.html', isAdmin: true });
     }
@@ -64,8 +69,9 @@ app.post('/api/login', async (req, res) => {
     const agent = await Agent.findOne({ mobile: email, password });
     const customer = await Customer.findOne({ mobile: email, password });
     
-    if (agent) return res.json({ success: true, redirectUrl: 'agent.html', isAdmin: false });
-    if (customer) return res.json({ success: true, redirectUrl: 'customer.html', isAdmin: false });
+    // Yahan hum userName aur userId bhi bhej rahe hain front-end ko
+    if (agent) return res.json({ success: true, redirectUrl: 'agent.html', isAdmin: false, userName: agent.fullName, userId: agent.userId || "MTEF0000" });
+    if (customer) return res.json({ success: true, redirectUrl: 'customer.html', isAdmin: false, userName: customer.fullName, userId: customer.userId || "MTEF@0000" });
     
     res.json({ success: false, message: 'Invalid Credentials!' });
 });
