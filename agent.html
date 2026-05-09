@@ -3,68 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTEF - Agent Portal</title>
+    <title>Agent Portal - MTEF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #0b0f19; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        .box { background-color: #1a2235; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); margin-bottom: 15px; }
-        h2 { text-align: center; color: #f5b041; margin-bottom: 20px; }
-        h3 { color: #fff; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: none; box-sizing: border-box; }
-        input { background-color: #fff; color: #000; font-weight: 500; }
-        button { font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-save { background-color: #f5b041; color: #000; }
-        .btn-logout { background-color: #e74c3c; color: white; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        /* Dashboard UI - Starting me ise hide karke rakhenge */
-        #dashboard-section { display: none; }
+        body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Inter', sans-serif; padding-bottom: 70px; }
         
-        .stats-card { background-color: #2a354f; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; border: 1px solid #3e4b6e; }
-        .stats-card h4 { margin: 0; color: #f5b041; font-size: 28px; }
-        .stats-card p { margin: 5px 0 0 0; color: #ccc; font-size: 14px; }
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background-color: #0b0f19; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1a2235; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #f5b041; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; color: #f5b041; }
+        .agent-info h2 { margin: 0; font-size: 20px; font-weight: 600; }
+        .agent-info p { margin: 2px 0 0 0; font-size: 11px; color: #f5b041; letter-spacing: 1px; text-transform: uppercase; }
+        .logout-btn { color: #64748b; font-size: 24px; cursor: pointer; transition: 0.3s; }
+        .logout-btn:hover { color: #e74c3c; }
+
+        /* Page Content */
+        .page { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards & UI Elements */
+        .row { display: flex; gap: 15px; margin-bottom: 20px; }
+        .card { background-color: #121826; border-radius: 16px; padding: 20px; border: 1px solid #1e293b; flex: 1; }
+        .card-green { border-color: #2ecc71; }
+        .card-blue { border-color: #3498db; }
+        .card-title { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .card-value { font-size: 28px; font-weight: 700; margin: 0; }
+        .text-green { color: #2ecc71; }
+        .text-blue { color: #3498db; }
+
+        /* Center Action Card */
+        .action-card { background-color: #121826; border-radius: 20px; padding: 30px 20px; text-align: center; border: 1px solid #1e293b; margin-top: 20px; }
+        .action-card i { font-size: 40px; color: #64748b; margin-bottom: 15px; }
+        .action-card h3 { margin: 0 0 10px 0; font-size: 18px; }
+        .action-card p { margin: 0; color: #64748b; font-size: 13px; }
+
+        /* Forms */
+        .section-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #3498db; padding-bottom: 10px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input, .input-group select { width: 100%; background-color: #0b0f19; border: 1px solid #1e293b; color: #fff; padding: 14px; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: #3498db; }
+        
+        .btn-primary { width: 100%; background-color: #2563eb; color: #fff; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-green { background-color: #16a34a; }
+        .btn-whatsapp { background-color: #25D366; color: #000; }
+
+        /* Support List */
+        .support-item { background-color: #121826; border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; gap: 15px; border: 1px solid #1e293b; }
+        .icon-box { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; flex-shrink: 0; }
+        .icon-green { background-color: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+        .icon-blue { background-color: rgba(52, 152, 219, 0.1); color: #3498db; }
+        .support-content h4 { margin: 0 0 5px 0; font-size: 15px; }
+        .support-content p { margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+        /* Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #0b0f19; display: flex; justify-content: space-around; padding: 12px 0 20px 0; border-top: 1px solid #1e293b; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #64748b; cursor: pointer; transition: 0.3s; width: 60px; }
+        .nav-item i { font-size: 20px; }
+        .nav-item span { font-size: 11px; font-weight: 500; }
+        .nav-item.active { color: #f5b041; }
     </style>
 </head>
 <body>
-    
-    <div>
-        <h2>AGENT PORTAL</h2>
 
-        <div class="box" id="bank-section">
-            <h3>🏦 Bank Account Details</h3>
-            <input type="text" id="bankName" placeholder="Bank Name (e.g., SBI)">
-            <input type="text" id="accHolder" placeholder="Account Holder Name">
-            <input type="number" id="accNumber" placeholder="Account Number">
-            <input type="text" id="ifsc" placeholder="IFSC Code">
-            
-            <button class="btn-save" onclick="saveBankDetails()">Save Bank Details</button>
+    <div class="header">
+        <div class="header-left">
+            <div class="avatar">AG</div>
+            <div class="agent-info">
+                <h2>Agent Portal</h2>
+                <p>MTEF NETWORK PARTNER</p>
+            </div>
+        </div>
+        <i class="fa-solid fa-power-off logout-btn" onclick="logout()"></i>
+    </div>
+
+    <div id="home" class="page active">
+        <div class="row">
+            <div class="card card-green">
+                <div class="card-title">Total Earnings</div>
+                <div class="card-value text-green">₹0</div>
+            </div>
+            <div class="card card-blue">
+                <div class="card-title">My Leads</div>
+                <div class="card-value text-blue">0</div>
+            </div>
         </div>
 
-        <div class="box" id="dashboard-section">
-            <h3>📊 Agent Dashboard</h3>
-            <p style="color: #2ecc71; text-align: center; font-weight: bold;">✔ Bank Verified</p>
-            
-            <div class="stats-card">
-                <h4>₹ 0.00</h4>
-                <p>Total Earnings</p>
-            </div>
-            
-            <div class="stats-card">
-                <h4>0</h4>
-                <p>Customers Added</p>
-            </div>
+        <div class="action-card" onclick="switchTab('leads')">
+            <i class="fa-solid fa-chart-line"></i>
+            <h3>Start Adding Leads</h3>
+            <p>Go to the Leads tab to register a new client for MTEF.</p>
+        </div>
+    </div>
 
-            <button class="btn-save" style="margin-top: 20px; background-color: #3498db; color: white;" onclick="alert('Client Management Feature Coming Soon!')">➕ Add New Client</button>
+    <div id="leads" class="page">
+        <div class="section-title" style="border-color: #3498db; color: #3498db;">
+            <i class="fa-solid fa-user-plus"></i> REGISTER NEW LEAD
+        </div>
+        <div class="card" style="padding: 25px 20px;">
+            <div class="input-group">
+                <label>Client Name</label>
+                <input type="text" placeholder="Enter full name">
+            </div>
+            <div class="input-group">
+                <label>WhatsApp Number</label>
+                <input type="number" placeholder="10-digit number">
+            </div>
+            <div class="input-group">
+                <label>Required Service</label>
+                <select>
+                    <option>Website Development</option>
+                    <option>App Development</option>
+                    <option>Digital Marketing</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="alert('Lead Submission Feature Coming Soon!')">Submit Lead</button>
+        </div>
+    </div>
+
+    <div id="wallet" class="page">
+        
+        <div class="section-title" style="border-color: #2ecc71; color: #2ecc71;">
+            <i class="fa-solid fa-wallet"></i> WITHDRAW FUNDS
+        </div>
+        <div class="card" style="padding: 25px 20px; margin-bottom: 25px;">
+            <div class="input-group">
+                <label>Withdrawal Amount (₹)</label>
+                <input type="number" placeholder="Min ₹500">
+            </div>
+            <div class="input-group">
+                <label>Your UPI ID</label>
+                <input type="text" placeholder="e.g. yourname@upi">
+            </div>
+            <p style="font-size: 11px; text-align: center; color: #64748b; margin-bottom: 15px;">Payouts are processed within 24 hours.</p>
+            <button class="btn-primary btn-green" onclick="alert('Insufficient Balance!')">Request Payout</button>
         </div>
 
-        <button class="btn-logout" onclick="logout()">Logout</button>
+        <div class="section-title" style="border-color: #f5b041; color: #f5b041;">
+            <i class="fa-solid fa-building-columns"></i> UPDATE BANK ACCOUNT
+        </div>
+        <div class="card" style="padding: 25px 20px;">
+            <p style="font-size: 12px; color: #94a3b8; margin-top: 0;">For direct bank transfers, please save your details below.</p>
+            <div class="input-group">
+                <input type="text" id="bankName" placeholder="Bank Name (e.g., SBI)">
+            </div>
+            <div class="input-group">
+                <input type="text" id="accHolder" placeholder="Account Holder Name">
+            </div>
+            <div class="input-group">
+                <input type="number" id="accNumber" placeholder="Account Number">
+            </div>
+            <div class="input-group">
+                <input type="text" id="ifsc" placeholder="IFSC Code">
+            </div>
+            <button class="btn-primary" style="background-color: #f5b041; color: #000;" onclick="saveBankDetails()">Save Bank Details</button>
+        </div>
+    </div>
+
+    <div id="support" class="page">
+        <div class="section-title" style="border-color: #f5b041; color: #f5b041;">
+            <i class="fa-solid fa-headset"></i> AGENT SUPPORT & RULES
+        </div>
+        
+        <div class="support-item">
+            <div class="icon-box icon-green">Rs</div>
+            <div class="support-content">
+                <h4>Payout Rules</h4>
+                <p>Minimum withdrawal limit ₹500 hai. Payout Request bhejne ke 24 ghante ke andar admin dwara payment clear kiya jayega.</p>
+            </div>
+        </div>
+
+        <div class="support-item">
+            <div class="icon-box icon-blue"><i class="fa-solid fa-users"></i></div>
+            <div class="support-content">
+                <h4>Lead Verification</h4>
+                <p>Aapki add ki gayi sari leads Admin dwara verify ki jayengi. Fake leads daalne par account block ho sakta hai.</p>
+            </div>
+        </div>
+
+        <div class="card" style="text-align: center; padding: 30px 20px; margin-top: 20px;">
+            <h4 style="margin: 0 0 10px 0;">Direct Admin Support</h4>
+            <p style="font-size: 12px; color: #94a3b8; margin: 0 0 20px 0;">Koi bhi problem aaye ya payout me issue ho, direct Mohit Sir (Admin) ko WhatsApp karein.</p>
+            <button class="btn-primary btn-whatsapp" onclick="window.open('https://wa.me/91XXXXXXXXXX', '_blank')">
+                <i class="fa-brands fa-whatsapp" style="font-size: 18px; margin-right: 5px; vertical-align: middle;"></i> Message Admin
+            </button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home')" id="nav-home">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('leads')" id="nav-leads">
+            <i class="fa-solid fa-user-group"></i>
+            <span>Leads</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('wallet')" id="nav-wallet">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Wallet</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('support')" id="nav-support">
+            <i class="fa-solid fa-headset"></i>
+            <span>Support</span>
+        </div>
     </div>
 
     <script>
-        // अगर बैंक डिटेल पहले ही सेव हो चुकी है, तो सीधा डैशबोर्ड दिखाओ
-        if(localStorage.getItem('bankSaved') === 'true') {
-            document.getElementById('bank-section').style.display = 'none';
-            document.getElementById('dashboard-section').style.display = 'block';
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(tabId).classList.add('active');
+            // Add active class to clicked nav item
+            document.getElementById('nav-' + tabId).classList.add('active');
         }
 
+        // Bank Details Saving API
         async function saveBankDetails() {
             const bankName = document.getElementById('bankName').value;
             const accHolder = document.getElementById('accHolder').value;
@@ -75,11 +237,9 @@
                 return alert("Please fill all bank details!");
             }
 
-            // यूजर की पहचान के लिए मोबाइल नंबर या ईमेल
-            const userEmail = localStorage.getItem('userEmail') || prompt("Security Verification: Please enter your login Mobile Number:");
+            const userEmail = localStorage.getItem('userEmail') || prompt("Verification: Please enter your login Email/Mobile:");
             if(!userEmail) return;
 
-            // डाटा सर्वर पर भेजना
             const res = await fetch('/api/add-bank', {
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'},
@@ -88,20 +248,20 @@
             
             const data = await res.json();
             alert(data.message);
-            
             if(data.success) {
-                // जादू: बैंक फॉर्म छुपाओ, और डैशबोर्ड दिखाओ!
-                document.getElementById('bank-section').style.display = 'none';
-                document.getElementById('dashboard-section').style.display = 'block';
-                
-                // ब्राउज़र में याद रखने के लिए सेव कर लो (ताकि बार-बार फॉर्म ना मांगे)
-                localStorage.setItem('bankSaved', 'true');
+                // Save successful, clear fields
+                document.getElementById('bankName').value = '';
+                document.getElementById('accHolder').value = '';
+                document.getElementById('accNumber').value = '';
+                document.getElementById('ifsc').value = '';
             }
         }
 
         function logout() {
-            localStorage.clear(); // सारा सेव डाटा हटा दो
-            window.location.href = "index.html"; // लॉगिन पेज पर वापस
+            if(confirm("Are you sure you want to logout?")) {
+                localStorage.clear();
+                window.location.href = "index.html";
+            }
         }
     </script>
 </body>
