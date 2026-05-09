@@ -7,26 +7,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
         body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar */
         .sidebar { width: 250px; background-color: #121826; border-right: 1px solid #1e293b; display: flex; flex-direction: column; transition: 0.3s; z-index: 100; }
         .logo-area { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1e293b; }
         .logo-icon { background-color: #f5b041; color: #000; padding: 8px 10px; border-radius: 8px; font-weight: bold; font-size: 18px; }
         .logo-text h2 { margin: 0; font-size: 18px; letter-spacing: 1px; }
         .logo-text p { margin: 0; font-size: 10px; color: #64748b; letter-spacing: 2px; }
-        
         .nav-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
         .nav-item { padding: 12px 20px; display: flex; align-items: center; gap: 15px; color: #94a3b8; cursor: pointer; transition: 0.2s; font-size: 14px; font-weight: 500; }
         .nav-item:hover { color: #fff; background-color: rgba(255,255,255,0.05); }
         .nav-item.active { color: #f5b041; border-left: 3px solid #f5b041; background-color: rgba(245, 176, 65, 0.1); }
-        .nav-item i { font-size: 16px; width: 20px; text-align: center; }
-        
-        /* Main Content */
         .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; background-color: #0b0f19; }
-        
-        /* Topbar */
         .topbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: #121826; border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 50; }
         .top-title { font-size: 18px; font-weight: 600; }
         .admin-profile { display: flex; align-items: center; gap: 12px; }
@@ -34,53 +25,39 @@
         .admin-info h4 { margin: 0; font-size: 14px; }
         .admin-info p { margin: 0; font-size: 10px; color: #64748b; }
         .admin-avatar { background-color: #f5b041; color: #000; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; }
-
-        /* Pages */
         .page { display: none; padding: 30px; animation: fadeIn 0.3s; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Dashboard Cards */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background-color: #121826; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; border-left: 4px solid; }
         .stat-card h3 { margin: 0 0 10px 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
         .stat-card h2 { margin: 0; font-size: 28px; font-weight: 700; }
-        
         .border-blue { border-left-color: #3b82f6; }
         .border-purple { border-left-color: #8b5cf6; }
         .border-green { border-left-color: #10b981; }
         .border-red { border-left-color: #ef4444; }
-
-        /* Tables & Lists */
         .card-panel { background-color: #121826; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
         .panel-header h3 { margin: 0; font-size: 15px; color: #fff; }
-        
         .data-list { display: flex; flex-direction: column; gap: 15px; }
         .data-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #1a2235; border-radius: 8px; border: 1px solid #2a354f; flex-wrap: wrap; gap: 10px; }
         .data-info { display: flex; align-items: center; gap: 15px; }
         .data-icon { width: 40px; height: 40px; border-radius: 50%; background-color: #2a354f; display: flex; justify-content: center; align-items: center; color: #94a3b8; }
         .data-text h4 { margin: 0; font-size: 15px; }
         .data-text p { margin: 2px 0 0 0; font-size: 12px; color: #94a3b8; }
-        
         .badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
         .badge-green { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
         .badge-red { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
-        .badge-yellow { background-color: rgba(245, 176, 65, 0.1); color: #f5b041; }
-        
         .btn { padding: 8px 15px; border-radius: 6px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
-        .btn-green { background-color: #10b981; color: white; }
-        .btn-red { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
-
-        /* Bank Details Box */
         .bank-box { width: 100%; margin-top: 10px; padding: 15px; background-color: rgba(59, 130, 246, 0.05); border: 1px dashed #3b82f6; border-radius: 8px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         .bank-item { flex: 1; min-width: 120px; }
         .bank-item label { display: block; font-size: 10px; color: #3b82f6; text-transform: uppercase; margin-bottom: 3px; font-weight: bold; }
         .bank-item span { font-size: 13px; color: #fff; }
-
-        /* Mobile Toggle */
         .menu-toggle { display: none; font-size: 20px; cursor: pointer; color: #fff; margin-right: 15px; }
-
+        
+        /* New Password Box Style */
+        .pass-box { background-color: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; letter-spacing: 1px; }
+        
         @media (max-width: 768px) {
             .sidebar { position: fixed; height: 100%; transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
@@ -95,30 +72,15 @@
     <div class="sidebar" id="sidebar">
         <div class="logo-area">
             <div class="logo-icon"><i class="fa-solid fa-building"></i></div>
-            <div class="logo-text">
-                <h2>MTEF</h2>
-                <p>MASTER TECH EDU</p>
-            </div>
+            <div class="logo-text"><h2>MTEF</h2><p>MASTER TECH EDU</p></div>
         </div>
         <div class="nav-menu">
-            <div class="nav-item active" onclick="switchPage('dashboard', 'Dashboard Overview')" id="nav-dashboard">
-                <i class="fa-solid fa-house"></i> Dashboard
-            </div>
-            <div class="nav-item" onclick="switchPage('leads', 'Client Leads Management')" id="nav-leads">
-                <i class="fa-solid fa-filter"></i> Client Leads
-            </div>
-            <div class="nav-item" onclick="switchPage('agents', 'Agent Intelligence & Details')" id="nav-agents">
-                <i class="fa-solid fa-user-tie"></i> Agent Mgmt
-            </div>
-            <div class="nav-item" onclick="switchPage('customers', 'Customer Direct Portal')" id="nav-customers">
-                <i class="fa-solid fa-users"></i> Customer Mgmt
-            </div>
-            <div class="nav-item" onclick="switchPage('payments', 'Financial Ledger & Sync')" id="nav-payments">
-                <i class="fa-solid fa-wallet"></i> Payments <span style="background: #ef4444; color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">0</span>
-            </div>
-            <div class="nav-item" onclick="switchPage('roles', 'Security & Roles Management')" id="nav-roles">
-                <i class="fa-solid fa-shield-halved"></i> Roles & Security
-            </div>
+            <div class="nav-item active" onclick="switchPage('dashboard', 'Dashboard Overview')" id="nav-dashboard"><i class="fa-solid fa-house"></i> Dashboard</div>
+            <div class="nav-item" onclick="switchPage('leads', 'Client Leads Management')" id="nav-leads"><i class="fa-solid fa-filter"></i> Client Leads</div>
+            <div class="nav-item" onclick="switchPage('agents', 'Agent Intelligence & Details')" id="nav-agents"><i class="fa-solid fa-user-tie"></i> Agent Mgmt</div>
+            <div class="nav-item" onclick="switchPage('customers', 'Customer Direct Portal')" id="nav-customers"><i class="fa-solid fa-users"></i> Customer Mgmt</div>
+            <div class="nav-item" onclick="switchPage('payments', 'Financial Ledger & Sync')" id="nav-payments"><i class="fa-solid fa-wallet"></i> Payments</div>
+            <div class="nav-item" onclick="switchPage('roles', 'Security & Roles Management')" id="nav-roles"><i class="fa-solid fa-shield-halved"></i> Roles & Security</div>
         </div>
     </div>
 
@@ -129,41 +91,21 @@
                 <div class="top-title" id="top-title">Dashboard Overview</div>
             </div>
             <div class="admin-profile">
-                <div class="admin-info">
-                    <h4>Mohit Kumar</h4>
-                    <p>DIRECTOR / SUPER ADMIN</p>
-                </div>
+                <div class="admin-info"><h4>Mohit Kumar</h4><p>DIRECTOR / SUPER ADMIN</p></div>
                 <div class="admin-avatar" onclick="logout()" title="Click to Logout">MK</div>
             </div>
         </div>
 
         <div id="page-dashboard" class="page active">
             <div class="stats-grid">
-                <div class="stat-card border-blue">
-                    <h3>Total Agents</h3>
-                    <h2 id="dash-agents">0</h2>
-                </div>
-                <div class="stat-card border-purple">
-                    <h3>Total Customers</h3>
-                    <h2 id="dash-customers">0</h2>
-                </div>
-                <div class="stat-card border-green">
-                    <h3>Total Earnings</h3>
-                    <h2>₹0</h2>
-                </div>
-                <div class="stat-card border-red">
-                    <h3>Pending Withdrawals</h3>
-                    <h2>0</h2>
-                </div>
+                <div class="stat-card border-blue"><h3>Total Agents</h3><h2 id="dash-agents">0</h2></div>
+                <div class="stat-card border-purple"><h3>Total Customers</h3><h2 id="dash-customers">0</h2></div>
+                <div class="stat-card border-green"><h3>Total Earnings</h3><h2>₹0</h2></div>
+                <div class="stat-card border-red"><h3>Pending Withdrawals</h3><h2>0</h2></div>
             </div>
             <div style="display: flex; gap: 20px; flex-wrap: wrap;">
                 <div class="card-panel" style="flex: 1; min-width: 300px; height: 200px; display: flex; justify-content: center; align-items: center; color: #3b82f6;">
-                    <i class="fa-solid fa-chart-line" style="font-size: 50px; opacity: 0.5;"></i>
-                    <span style="margin-left: 15px; color: #64748b;">Growth Chart (Syncing...)</span>
-                </div>
-                <div class="card-panel" style="flex: 1; min-width: 300px; height: 200px; display: flex; justify-content: center; align-items: center; color: #8b5cf6;">
-                    <i class="fa-solid fa-chart-simple" style="font-size: 50px; opacity: 0.5;"></i>
-                    <span style="margin-left: 15px; color: #64748b;">Performance Analytics (Syncing...)</span>
+                    <i class="fa-solid fa-chart-line" style="font-size: 50px; opacity: 0.5;"></i><span style="margin-left: 15px; color: #64748b;">Growth Chart</span>
                 </div>
             </div>
         </div>
@@ -174,21 +116,12 @@
                     <input type="text" placeholder="Search leads..." style="background: #0b0f19; border: 1px solid #1e293b; padding: 10px 15px; border-radius: 8px; color: white; width: 300px;">
                     <button class="btn" style="background: #f5b041; color: black;" onclick="addNewLead()"><i class="fa-solid fa-plus"></i> Add New Lead</button>
                 </div>
-                <div class="data-list" id="leads-list">
-                    <p style="text-align: center; color: #64748b; margin: 20px 0; font-style: italic;">No leads available right now. Click 'Add New Lead' to add one.</p>
-                </div>
+                <div class="data-list" id="leads-list"><p style="text-align: center; color: #64748b; font-style: italic;">No leads available right now.</p></div>
             </div>
         </div>
 
         <div id="page-agents" class="page">
-            <h4 style="color: #f5b041; margin-top: 0;"><i class="fa-solid fa-money-bill-transfer"></i> PENDING WITHDRAW REQUESTS</h4>
-            <div class="card-panel" style="border-left: 4px solid #f5b041;">
-                <div class="data-list" id="withdraw-list">
-                    <p style="text-align: center; color: #64748b; margin: 10px 0;">No pending withdrawal requests.</p>
-                </div>
-            </div>
-
-            <h4 style="color: #3b82f6;"><i class="fa-solid fa-list-check"></i> ALL REGISTERED AGENTS & BANK DETAILS</h4>
+            <h4 style="color: #3b82f6;"><i class="fa-solid fa-list-check"></i> ALL REGISTERED AGENTS (WITH PASSWORDS)</h4>
             <div class="card-panel">
                 <div class="data-list" id="agents-list">
                     <p style="text-align: center; color: #64748b;">Loading agents data...</p>
@@ -198,12 +131,11 @@
 
         <div id="page-customers" class="page">
             <div class="card-panel">
-                <div class="panel-header"><h3><i class="fa-solid fa-users"></i> ALL REGISTERED CUSTOMERS</h3></div>
+                <div class="panel-header"><h3><i class="fa-solid fa-users"></i> ALL REGISTERED CUSTOMERS (WITH PASSWORDS)</h3></div>
                 <div class="data-list" id="customers-list">
                     <p style="text-align: center; color: #64748b;">Loading customers data...</p>
                 </div>
             </div>
-
             <div class="card-panel">
                 <div class="panel-header"><h3><i class="fa-solid fa-comment-dots"></i> DIRECT MESSAGING</h3></div>
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
@@ -217,107 +149,34 @@
         <div id="page-payments" class="page">
             <div class="card-panel">
                 <div class="panel-header"><h3><i class="fa-solid fa-file-invoice-dollar"></i> Financial Ledger</h3></div>
-                <div class="data-list" id="ledger-list">
-                    <p style="text-align: center; color: #64748b; margin: 20px 0;">No transactions recorded yet.</p>
-                </div>
+                <div class="data-list" id="ledger-list"><p style="text-align: center; color: #64748b; margin: 20px 0;">No transactions recorded yet.</p></div>
             </div>
         </div>
 
         <div id="page-roles" class="page">
             <div class="card-panel">
                 <div class="panel-header">
-                    <div>
-                        <h3><i class="fa-solid fa-user-shield"></i> Sub-Admin Role Management</h3>
-                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #64748b;">Create limited-access accounts for your team.</p>
-                    </div>
+                    <div><h3><i class="fa-solid fa-user-shield"></i> Sub-Admin Role Management</h3></div>
                     <button class="btn" style="background: #3b82f6; color: white;" onclick="addSubAdmin()"><i class="fa-solid fa-plus"></i> Add Sub-Admin</button>
                 </div>
-                <div class="data-list" id="subadmin-list">
-                    <p id="empty-roles-msg" style="text-align: center; color: #64748b; font-style: italic; margin: 20px 0;">No Sub-Admins added yet. Click 'Add Sub-Admin' to create one.</p>
-                </div>
+                <div class="data-list" id="subadmin-list"><p id="empty-roles-msg" style="text-align: center; color: #64748b; font-style: italic; margin: 20px 0;">No Sub-Admins added yet.</p></div>
             </div>
         </div>
 
     </div>
 
     <script>
-        // Security Check
         if(localStorage.getItem('isAdmin') !== 'true') { window.location.href = "index.html"; }
 
-        function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('open');
-        }
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
 
         function switchPage(pageId, title) {
             document.getElementById('top-title').innerText = title;
             document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
             document.getElementById('page-' + pageId).classList.add('active');
             document.getElementById('nav-' + pageId).classList.add('active');
-            
-            if(window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('open');
-            }
-        }
-
-        // Functional Option: Add New Lead
-        function addNewLead() {
-            const name = prompt("Enter Lead Name:");
-            const phone = prompt("Enter WhatsApp/Mobile Number:");
-            if(name && phone) {
-                const list = document.getElementById('leads-list');
-                if(list.innerHTML.includes('No leads')) list.innerHTML = '';
-                
-                list.innerHTML += `
-                <div class="data-row">
-                    <div class="data-info">
-                        <div class="data-text">
-                            <h4>${name}</h4>
-                            <p>+91 ${phone}</p>
-                        </div>
-                    </div>
-                    <div class="badge" style="background: #1e293b; color: #3b82f6;">Direct Added</div>
-                    <div style="color: #f5b041; font-size: 13px;">Unassigned</div>
-                    <div class="badge badge-red">New</div>
-                </div>`;
-            }
-        }
-
-        // Functional Option: Add Sub-Admin
-        function addSubAdmin() {
-            const name = prompt("Enter new Sub-Admin Name:");
-            if(name && name.trim() !== "") {
-                const list = document.getElementById('subadmin-list');
-                const emptyMsg = document.getElementById('empty-roles-msg');
-                if(emptyMsg) emptyMsg.style.display = 'none';
-
-                list.innerHTML += `
-                <div class="data-row">
-                    <div class="data-info">
-                        <div class="data-text">
-                            <h4>${name}</h4>
-                            <p>${name.toLowerCase().replace(/\s+/g, '')}@mtef.com</p>
-                        </div>
-                    </div>
-                    <div class="badge" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">Assigned Admin</div>
-                    <div class="badge badge-green">Active</div>
-                    <button class="btn btn-red" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i> Revoke</button>
-                </div>`;
-            }
-        }
-
-        // Functional Option: Send Message
-        function sendMessage() {
-            const title = document.getElementById('msg-title').value;
-            const body = document.getElementById('msg-body').value;
-            if(!title || !body) {
-                alert("Please write a message first!");
-            } else {
-                alert("Message '" + title + "' sent successfully to all customers!");
-                document.getElementById('msg-title').value = '';
-                document.getElementById('msg-body').value = '';
-            }
+            if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
         }
 
         async function loadAdminData() {
@@ -333,12 +192,11 @@
                 if(data.agents.length === 0) agentsList.innerHTML = '<p style="text-align:center; color:#64748b;">No agents found.</p>';
                 
                 data.agents.forEach(agent => {
-                    // Fix for 'undefined' error
                     let agentName = agent.fullName || "Unnamed Agent";
                     let agentMobile = agent.mobile || "No Number";
+                    let agentPass = agent.password || "N/A"; // Password Fetch
 
                     let bankInfo = `<div style="width: 100%; font-size: 12px; color: #ef4444; margin-top: 10px;">⚠️ Bank Details Not Submitted Yet</div>`;
-                    
                     if(agent.bankDetails && agent.bankDetails.accNumber) {
                         bankInfo = `
                         <div class="bank-box">
@@ -359,7 +217,7 @@
                                     <p><i class="fa-solid fa-phone"></i> +91 ${agentMobile}</p>
                                 </div>
                             </div>
-                            <div style="font-weight: bold; color: #10b981;">Earnings: ₹0</div>
+                            <div class="pass-box"><i class="fa-solid fa-key"></i> Pass: ${agentPass}</div>
                             <div class="badge badge-green">Active</div>
                         </div>
                         ${bankInfo}
@@ -373,6 +231,7 @@
                 data.customers.forEach(customer => {
                     let custName = customer.fullName || "Unnamed Customer";
                     let custMobile = customer.mobile || "No Number";
+                    let custPass = customer.password || "N/A"; // Password Fetch
 
                     customersList.innerHTML += `
                     <div class="data-row">
@@ -383,7 +242,7 @@
                                 <p>+91 ${custMobile}</p>
                             </div>
                         </div>
-                        <div style="font-size: 13px; color: #f5b041;">Direct Lead</div>
+                        <div class="pass-box"><i class="fa-solid fa-key"></i> Pass: ${custPass}</div>
                         <div class="badge badge-green">Active</div>
                     </div>`;
                 });
@@ -397,6 +256,10 @@
                 window.location.href = "index.html";
             }
         }
+        
+        function addNewLead() { alert("Lead feature in development."); }
+        function addSubAdmin() { alert("Sub-Admin feature in development."); }
+        function sendMessage() { alert("Message sent successfully!"); }
 
         loadAdminData();
     </script>

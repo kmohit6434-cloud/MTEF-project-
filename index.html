@@ -4,23 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTEF - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #0b0f19; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .box { background-color: #1a2235; padding: 30px; border-radius: 12px; width: 350px; border: 1px solid #1e293b; }
-        input, button { width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box; }
+        input, button { width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box; font-size: 15px; }
         input { background-color: #0b0f19; color: #fff; border: 1px solid #3e4b6e; }
-        button { background-color: #f5b041; color: #000; font-weight: bold; cursor: pointer; }
+        input:focus { outline: none; border-color: #3498db; }
+        button { background-color: #f5b041; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #e6a33c; }
     </style>
 </head>
 <body>
     <div class="box">
-        <h2 style="text-align:center; color:#f5b041;">MTEF LOGIN</h2>
-        <input type="text" id="email" placeholder="Mobile / Admin ID">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <p style="text-align:center; font-size:14px;">No account? <a href="register.html" style="color:#f5b041;">Register</a></p>
+        
+        <div id="login-section">
+            <h2 style="text-align:center; color:#f5b041;">MTEF LOGIN</h2>
+            <input type="text" id="email" placeholder="Mobile / Admin ID">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <div style="text-align:center; margin-top:10px;">
+                <a href="#" onclick="showSection('forgot-section')" style="color:#3498db; font-size:13px; text-decoration:none;">Forgot Password?</a>
+            </div>
+            <p style="text-align:center; font-size:14px; color:#94a3b8;">No account? <a href="register.html" style="color:#f5b041; text-decoration:none;">Register</a></p>
+        </div>
+
+        <div id="forgot-section" style="display:none; text-align:center;">
+            <h2 style="color:#3498db; margin-bottom:10px;">Reset Password</h2>
+            <p style="font-size:12px; color:#94a3b8; margin-top:0;">Enter your registered Mobile or Email</p>
+            <input type="text" id="reset-id" placeholder="Mobile Number or Email ID">
+            <button onclick="submitForgot()" style="background-color:#3498db; color:white;">Submit Request</button>
+            <p style="margin-top:15px; font-size:13px;"><a href="#" onclick="showSection('login-section')" style="color:#94a3b8; text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> Back to Login</a></p>
+        </div>
+
+        <div id="success-msg" style="display:none; text-align:center;">
+            <i class="fa-solid fa-circle-check" style="color:#2ecc71; font-size:50px; margin-bottom:15px;"></i>
+            <h2 style="color:#2ecc71; margin:0 0 10px 0;">Thank you</h2>
+            <p style="font-size:15px; color:#cbd5e1; line-height:1.6;">
+                Your request has been sent MTEF team<br>
+                Your password send email ✉️<br>
+                And sms box
+            </p>
+            <button onclick="showSection('login-section')" style="margin-top:20px; background-color:#1e293b; color:white;">Go Back</button>
+        </div>
+
     </div>
+
     <script>
+        function showSection(id) {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('forgot-section').style.display = 'none';
+            document.getElementById('success-msg').style.display = 'none';
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function submitForgot() {
+            const resetId = document.getElementById('reset-id').value;
+            if(!resetId) {
+                alert("Please enter your Mobile Number or Email!");
+            } else {
+                // Submit hone ke baad aapka message dikhayega
+                showSection('success-msg');
+            }
+        }
+
         async function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
