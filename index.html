@@ -5,44 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTEF - Login</title>
     <style>
-        body { background-color: #0b0f19; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background-color: #1a2235; padding: 40px; border-radius: 12px; width: 340px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; }
-        h2 { color: #f5b041; margin-bottom: 25px; font-size: 28px; }
-        input, button { width: 100%; padding: 14px; margin: 12px 0; border-radius: 6px; border: none; box-sizing: border-box; font-size: 15px; }
-        input { background-color: #2a354f; color: #fff; outline: none; border: 1px solid #3e4b6e; }
-        button { background-color: #f5b041; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background-color: #d49536; }
-        .links { margin-top: 20px; font-size: 14px; color: #aaa; }
-        .links a { color: #f5b041; text-decoration: none; font-weight: bold; }
+        body { background-color: #0b0f19; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { background-color: #1a2235; padding: 30px; border-radius: 12px; width: 350px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); border: 1px solid #1e293b; }
+        h2 { text-align: center; color: #f5b041; margin-bottom: 20px; letter-spacing: 1px; }
+        input, button { width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box; font-size: 15px; }
+        input { background-color: #0b0f19; color: #fff; border: 1px solid #3e4b6e; }
+        input:focus { outline: none; border-color: #3498db; }
+        button { background-color: #f5b041; color: #000; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background-color: #e6a33c; }
+        .link { text-align: center; margin-top: 15px; font-size: 14px; color: #94a3b8; }
+        .link a { color: #f5b041; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>MTEF LOGIN</h2>
-        <input type="text" id="id" placeholder="Mobile Number or Email">
+        <input type="text" id="email" placeholder="Mobile Number or Admin Email">
         <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <div class="links">
-            New user? <a href="register.html">Create an Account</a>
-        </div>
+        <button onclick="login()">Login to Portal</button>
+        <div class="link">Don't have an account? <a href="register.html">Register Here</a></div>
     </div>
 
     <script>
         async function login() {
-            const email = document.getElementById('id').value;
+            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            if(!email || !password) return alert("Please enter credentials");
 
-            const res = await fetch('/api/login', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email, password })
-            });
-            const data = await res.json();
-            if(data.success) {
-                localStorage.setItem('userSession', email);
-                window.location.href = data.redirectUrl;
-            } else {
-                alert(data.message);
+            if(!email || !password) return alert("Please fill all fields!");
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await res.json();
+                
+                if(data.success) {
+                    // 🛑 YAHI WO CHABI HAI JO PEHLE MISSING THI 🛑
+                    localStorage.setItem('userEmail', email); // ID save ho gayi
+                    
+                    if(data.isAdmin) {
+                        localStorage.setItem('isAdmin', 'true'); // Admin ki chabi save ho gayi
+                    } else {
+                        localStorage.removeItem('isAdmin'); // Agar normal user hai to admin chabi hata do
+                    }
+                    
+                    window.location.href = data.redirectUrl; // Ab andar bhej do
+                } else {
+                    alert(data.message); // Password galat hone par
+                }
+            } catch (error) {
+                alert("Server error! Please try again later.");
             }
         }
     </script>
