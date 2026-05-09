@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTEF Admin - Boss Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Inter', sans-serif; padding-bottom: 20px; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background-color: #0b0f19; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1a2235; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 50px; height: 50px; border-radius: 12px; background-color: #e74c3c; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; color: #fff; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3); }
+        .admin-info h2 { margin: 0; font-size: 20px; font-weight: 700; color: #fff; }
+        .admin-info p { margin: 2px 0 0 0; font-size: 11px; color: #e74c3c; letter-spacing: 1px; text-transform: uppercase; font-weight: bold; }
+        .logout-btn { background-color: #1a2235; color: #e74c3c; border: 1px solid #e74c3c; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+
+        /* Stats Cards */
+        .stats-container { display: flex; gap: 15px; padding: 20px; }
+        .stat-card { flex: 1; background-color: #121826; border-radius: 16px; padding: 20px; border: 1px solid #1e293b; text-align: center; }
+        .stat-card.agents { border-bottom: 4px solid #f5b041; }
+        .stat-card.customers { border-bottom: 4px solid #3498db; }
+        .stat-card i { font-size: 24px; margin-bottom: 10px; }
+        .stat-card.agents i { color: #f5b041; }
+        .stat-card.customers i { color: #3498db; }
+        .stat-value { font-size: 32px; font-weight: 700; margin: 0; }
+        .stat-title { font-size: 12px; color: #94a3b8; text-transform: uppercase; margin-top: 5px; }
+
+        /* Tabs */
+        .tab-container { display: flex; padding: 0 20px; gap: 10px; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 12px; text-align: center; background-color: #1a2235; color: #64748b; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; border: 1px solid transparent; }
+        .tab.active { background-color: #2563eb; color: #fff; border-color: #3b82f6; }
+
+        /* User Lists */
+        .list-section { display: none; padding: 0 20px; }
+        .list-section.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .user-card { background-color: #121826; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1e293b; position: relative; }
+        .user-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        .user-icon { width: 40px; height: 40px; border-radius: 50%; background-color: #1a2235; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 18px; }
+        .user-name { font-weight: 600; font-size: 16px; margin: 0; color: #fff; }
+        .user-date { font-size: 11px; color: #64748b; margin: 0; }
+        
+        .user-detail { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; color: #cbd5e1; }
+        .user-detail i { color: #3498db; width: 15px; text-align: center; }
+        
+        .bank-box { margin-top: 15px; padding: 12px; background-color: rgba(46, 204, 113, 0.05); border: 1px dashed #2ecc71; border-radius: 8px; }
+        .bank-title { font-size: 11px; color: #2ecc71; text-transform: uppercase; font-weight: 700; margin: 0 0 8px 0; }
+        .bank-detail { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; color: #94a3b8; }
+        .bank-detail span { color: #fff; font-weight: 500; }
+        .no-bank { color: #e74c3c; font-size: 12px; font-style: italic; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <div class="avatar"><i class="fa-solid fa-crown"></i></div>
+            <div class="admin-info">
+                <h2>Mohit Sir</h2>
+                <p>MTEF Admin</p>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card agents">
+            <i class="fa-solid fa-user-tie"></i>
+            <div class="stat-value" id="total-agents">0</div>
+            <div class="stat-title">Total Agents</div>
+        </div>
+        <div class="stat-card customers">
+            <i class="fa-solid fa-users"></i>
+            <div class="stat-value" id="total-customers">0</div>
+            <div class="stat-title">Total Customers</div>
+        </div>
+    </div>
+
+    <div class="tab-container">
+        <div class="tab active" onclick="switchTab('agents')" id="tab-agents">Agents List</div>
+        <div class="tab" onclick="switchTab('customers')" id="tab-customers">Customers List</div>
+    </div>
+
+    <div id="section-agents" class="list-section active">
+        <p style="text-align: center; color: #64748b;">Loading Agents...</p>
+    </div>
+
+    <div id="section-customers" class="list-section">
+        <p style="text-align: center; color: #64748b;">Loading Customers...</p>
+    </div>
+
+    <script>
+        // Check if admin is logged in (Security Check)
+        if(localStorage.getItem('isAdmin') !== 'true') {
+            window.location.href = "index.html";
+        }
+
+        // Tab Switching Logic
+        function switchTab(tab) {
+            document.getElementById('tab-agents').classList.remove('active');
+            document.getElementById('tab-customers').classList.remove('active');
+            document.getElementById('section-agents').classList.remove('active');
+            document.getElementById('section-customers').classList.remove('active');
+
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('section-' + tab).classList.add('active');
+        }
+
+        // Fetch and Render Data from Database
+        async function loadAdminData() {
+            try {
+                const response = await fetch('/api/admin/all-data');
+                const data = await response.json();
+
+                // Update Stats
+                document.getElementById('total-agents').innerText = data.agents.length;
+                document.getElementById('total-customers').innerText = data.customers.length;
+
+                // Render Agents
+                const agentsDiv = document.getElementById('section-agents');
+                agentsDiv.innerHTML = '';
+                if(data.agents.length === 0) agentsDiv.innerHTML = '<p style="text-align:center; color:#64748b;">No Agents Registered Yet.</p>';
+                
+                data.agents.forEach(agent => {
+                    let bankHTML = '<div class="no-bank">Bank Details not updated yet.</div>';
+                    if(agent.bankDetails && agent.bankDetails.accNumber) {
+                        bankHTML = `
+                            <div class="bank-box">
+                                <p class="bank-title"><i class="fa-solid fa-building-columns"></i> Verified Bank</p>
+                                <div class="bank-detail">Bank Name: <span>${agent.bankDetails.bankName}</span></div>
+                                <div class="bank-detail">A/c Holder: <span>${agent.bankDetails.accHolder}</span></div>
+                                <div class="bank-detail">Account No: <span>${agent.bankDetails.accNumber}</span></div>
+                                <div class="bank-detail">IFSC: <span>${agent.bankDetails.ifsc}</span></div>
+                            </div>
+                        `;
+                    }
+
+                    agentsDiv.innerHTML += `
+                        <div class="user-card">
+                            <div class="user-header">
+                                <div class="user-icon"><i class="fa-solid fa-user-tie"></i></div>
+                                <div>
+                                    <h3 class="user-name">${agent.fullName}</h3>
+                                    <p class="user-date">Agent Partner</p>
+                                </div>
+                            </div>
+                            <div class="user-detail"><i class="fa-solid fa-phone"></i> +91 ${agent.mobile}</div>
+                            ${bankHTML}
+                        </div>
+                    `;
+                });
+
+                // Render Customers
+                const customersDiv = document.getElementById('section-customers');
+                customersDiv.innerHTML = '';
+                if(data.customers.length === 0) customersDiv.innerHTML = '<p style="text-align:center; color:#64748b;">No Customers Registered Yet.</p>';
+
+                data.customers.forEach(customer => {
+                    customersDiv.innerHTML += `
+                        <div class="user-card" style="border-color: #3498db;">
+                            <div class="user-header">
+                                <div class="user-icon" style="background-color: rgba(52,152,219,0.1); color: #3498db;"><i class="fa-solid fa-user"></i></div>
+                                <div>
+                                    <h3 class="user-name">${customer.fullName}</h3>
+                                    <p class="user-date">Direct Customer</p>
+                                </div>
+                            </div>
+                            <div class="user-detail"><i class="fa-solid fa-phone"></i> +91 ${customer.mobile}</div>
+                        </div>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Error loading data", error);
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        // Load data on startup
+        loadAdminData();
+    </script>
+</body>
+</html>
