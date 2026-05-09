@@ -8,7 +8,7 @@ app.use(express.static('./'));
 
 const mongoURI = process.env.MONGODB_URI;
 
-// 🛑 SCHEMA UPDATED: Project Data tracking added
+// 🛑 SCHEMA UPDATED: Agent tracking & Project tracking added
 const UserSchema = new mongoose.Schema({
     fullName: String, mobile: String, password: String, accountType: String, userId: String,
     bankDetails: { bankName: String, accHolder: String, accNumber: String, ifsc: String },
@@ -19,6 +19,11 @@ const UserSchema = new mongoose.Schema({
         dueDate: { type: String, default: 'Under Process' },
         statusText: { type: String, default: 'Pending Initiation' },
         serviceName: { type: String, default: 'Not Assigned' }
+    },
+    agentData: {
+        earnings: { type: Number, default: 0 },
+        leadsCount: { type: Number, default: 0 },
+        status: { type: String, default: 'Active' }
     }
 });
 const Customer = mongoose.model('Customer', UserSchema, 'customers');
@@ -27,9 +32,7 @@ const Agent = mongoose.model('Agent', UserSchema, 'agents');
 mongoose.connect(mongoURI).then(async () => {
     console.log('✅ Connected to MongoDB');
     const exists = await Customer.findOne({ mobile: '7891769227' });
-    if (!exists) {
-        await new Customer({ fullName: 'Mohit', mobile: '7891769227', password: '0580', accountType: 'Customer', userId: 'MTEF@6866' }).save();
-    }
+    if (!exists) await new Customer({ fullName: 'Mohit', mobile: '7891769227', password: '0580', accountType: 'Customer', userId: 'MTEF@6866' }).save();
 }).catch(e => console.log(e));
 
 app.post('/api/send-otp', async (req, res) => { res.json({ success: true, message: "OTP Bypassed for now" }); });
@@ -75,7 +78,13 @@ app.post('/api/admin/update-project', async (req, res) => {
     res.json({ success: true, message: "Project Data Updated Live!" });
 });
 
-// 🔄 GET FRESH USER DATA (For Live Refresh)
+// 👑 ADMIN API: Update Agent Data
+app.post('/api/admin/update-agent', async (req, res) => {
+    const { mobile, earnings, leadsCount, status } = req.body;
+    await Agent.findOneAndUpdate({ mobile }, { agentData: { earnings, leadsCount, status } });
+    res.json({ success: true, message: "Agent Data Updated Live!" });
+});
+
 app.post('/api/get-user', async (req, res) => {
     const { mobile, type } = req.body;
     const Model = type === 'Agent' ? Agent : Customer;
@@ -83,13 +92,11 @@ app.post('/api/get-user', async (req, res) => {
     if(user) res.json({ success: true, user }); else res.json({ success: false });
 });
 
-// 🔑 CUSTOMER PASSWORD CHANGE API
 app.post('/api/change-password', async (req, res) => {
     const { mobile, oldPass, newPass } = req.body;
-    const user = await Customer.findOne({ mobile, password: oldPass });
+    const user = await Customer.findOne({ mobile, password: oldPass }) || await Agent.findOne({ mobile, password: oldPass });
     if(!user) return res.json({ success: false, message: "Incorrect Old Password!" });
-    user.password = newPass;
-    await user.save();
+    user.password = newPass; await user.save();
     res.json({ success: true, message: "Password Changed Successfully!" });
 });
 
