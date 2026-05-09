@@ -10,74 +10,63 @@ const mongoURI = process.env.MONGODB_URI;
 mongoose.connect(mongoURI).then(() => console.log('✅ Connected to MongoDB')).catch(e => console.log(e));
 
 const UserSchema = new mongoose.Schema({
-    fullName: String, email: String, mobile: String, password: String, accountType: String,
+    fullName: String, mobile: String, password: String, accountType: String,
     bankDetails: { bankName: String, accHolder: String, accNumber: String, ifsc: String }
 });
 const Customer = mongoose.model('Customer', UserSchema, 'customers');
 const Agent = mongoose.model('Agent', UserSchema, 'agents');
 
 let tempOTPs = {}; 
-let otpLimits = {}; // 🛑 3 OTP LIMIT
+let otpLimits = {};
 
-// 📱 FAST2SMS QUICK SMS API (NO VERIFICATION REQUIRED)
+// 📱 MOBILE OTP API
 app.post('/api/send-otp', async (req, res) => {
     const { mobile } = req.body;
-    
     if (!otpLimits[mobile]) otpLimits[mobile] = 0;
-    if (otpLimits[mobile] >= 3) {
-        return res.json({ success: false, message: "Limit Exceeded! Maximum 3 OTPs allowed." });
-    }
+    if (otpLimits[mobile] >= 3) return res.json({ success: false, message: "Limit: Max 3 OTPs allowed" });
 
     const otp = Math.floor(100000 + Math.random() * 900000);
     tempOTPs[mobile] = otp; 
     
     try {
-        // Yahan hum 'q' (Quick) route use kar rahe hain
         const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
             method: 'POST',
             headers: { 'authorization': process.env.FAST2SMS_API_KEY, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                route: 'q', 
-                message: `Welcome to MTEF! Your Registration OTP is: ${otp}`, 
-                numbers: mobile 
-            })
+            body: JSON.stringify({ route: 'q', message: `MTEF OTP: ${otp}`, numbers: mobile })
         });
         const data = await response.json();
-        
         if (data.return) {
-            otpLimits[mobile]++; 
-            res.json({ success: true, message: `OTP Sent Successfully! (Attempt ${otpLimits[mobile]}/3)` });
-        } else {
-            console.log("Fast2SMS Error:", data);
-            res.json({ success: false, message: "Fast2SMS Error! Please try again." });
-        }
+            otpLimits[mobile]++;
+            res.json({ success: true, message: "OTP Sent!" });
+        } else { res.json({ success: false, message: "Fast2SMS Error" }); }
     } catch (e) { res.json({ success: false, message: "Server Error" }); }
 });
 
 // 📝 REGISTRATION API
 app.post('/api/register', async (req, res) => {
-    try {
-        const { fullName, email, mobile, password, accountType, otp } = req.body;
-        if (tempOTPs[mobile] != otp) return res.json({ success: false, message: 'Invalid OTP!' });
-        
-        const Model = accountType === 'Agent' ? Agent : Customer;
-        await new Model({ fullName, email: email || "", mobile, password, accountType }).save();
-        
-        delete tempOTPs[mobile]; 
-        delete otpLimits[mobile]; 
-        res.json({ success: true, message: 'Registration Successful! Data Saved.' });
-    } catch (err) {
-        res.json({ success: false, message: "Database Error: " + err.message });
-    }
+    const { fullName, mobile, password, accountType, otp } = req.body;
+    if (tempOTPs[mobile] != otp) return res.json({ success: false, message: 'Invalid OTP!' });
+    const Model = accountType === 'Agent' ? Agent : Customer;
+    await new Model({ fullName, mobile, password, accountType }).save();
+    delete tempOTPs[mobile];
+    res.json({ success: true, message: 'Registration Done!' });
 });
 
+// 🔐 MASTER ADMIN LOGIN FIX
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    if (email === "mohitkumarolanda@gmail.com" && password === "Mohit@Admin786") return res.json({ success: true, redirectUrl: 'admin_dashboard.html' });
-    const agent = await Agent.findOne({ $or: [{email}, {mobile: email}], password });
-    const customer = await Customer.findOne({ $or: [{email}, {mobile: email}], password });
-    if (agent) return res.json({ success: true, redirectUrl: 'agent.html' });
-    if (customer) return res.json({ success: true, redirectUrl: 'customer.html' });
+    
+    // Nayi Admin ID aur Password
+    if (email === "MTEF@0580" && password === "Aarav@divyansh@0580") {
+        return res.json({ success: true, redirectUrl: 'admin_dashboard.html', isAdmin: true });
+    }
+    
+    const agent = await Agent.findOne({ mobile: email, password });
+    const customer = await Customer.findOne({ mobile: email, password });
+    
+    if (agent) return res.json({ success: true, redirectUrl: 'agent.html', isAdmin: false });
+    if (customer) return res.json({ success: true, redirectUrl: 'customer.html', isAdmin: false });
+    
     res.json({ success: false, message: 'Invalid Credentials!' });
 });
 
@@ -89,7 +78,7 @@ app.get('/api/admin/all-data', async (req, res) => {
 
 app.post('/api/add-bank', async (req, res) => {
     const { email, bankName, accHolder, accNumber, ifsc } = req.body;
-    await Agent.findOneAndUpdate({ $or: [{email}, {mobile: email}] }, { bankDetails: { bankName, accHolder, accNumber, ifsc } });
+    await Agent.findOneAndUpdate({ mobile: email }, { bankDetails: { bankName, accHolder, accNumber, ifsc } });
     res.json({ success: true, message: "Bank Details Updated!" });
 });
 
