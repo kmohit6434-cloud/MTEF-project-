@@ -6,22 +6,26 @@
     <title>MTEF - Registration</title>
     <style>
         body { background-color: #0b0f19; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .box { background-color: #1a2235; padding: 30px; border-radius: 12px; width: 350px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
-        h2 { text-align: center; color: #f5b041; margin-bottom: 20px; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: none; box-sizing: border-box; }
-        input, select { background-color: #2a354f; color: #fff; border: 1px solid #3e4b6e; }
-        button { background-color: #f5b041; color: #000; font-weight: bold; cursor: pointer; }
-        .login-link { text-align: center; margin-top: 15px; font-size: 14px; }
-        .login-link a { color: #f5b041; text-decoration: none; }
+        .box { background-color: #1a2235; padding: 30px; border-radius: 12px; width: 350px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); border: 1px solid #1e293b; }
+        h2 { text-align: center; color: #f5b041; margin-bottom: 20px; letter-spacing: 1px; }
+        input, select, button { width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box; font-size: 15px; }
+        input, select { background-color: #0b0f19; color: #fff; border: 1px solid #3e4b6e; }
+        input:focus, select:focus { outline: none; border-color: #3498db; }
+        button { background-color: #f5b041; color: #000; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background-color: #e6a33c; }
+        .login-link { text-align: center; margin-top: 15px; font-size: 14px; color: #94a3b8; }
+        .login-link a { color: #f5b041; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>REGISTRATION</h2>
         <input type="text" id="name" placeholder="Full Name">
-        <input type="number" id="mobile" placeholder="WhatsApp Number (10 Digits)">
         
-        <button id="otp-btn" onclick="sendOTP()">Get WhatsApp OTP</button>
+        <input type="number" id="mobile" placeholder="Mobile Number (10 Digits)">
+        
+        <button id="otp-btn" onclick="sendOTP()">Send OTP</button>
+        
         <input type="text" id="otp" placeholder="Enter OTP">
         <input type="password" id="password" placeholder="Set Password">
         
@@ -46,7 +50,7 @@
             });
             const data = await res.json();
             alert(data.message);
-            document.getElementById('otp-btn').innerText = 'Get WhatsApp OTP';
+            document.getElementById('otp-btn').innerText = 'Send OTP';
         }
 
         async function register() {
