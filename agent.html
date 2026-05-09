@@ -3,47 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent Portal</title>
+    <title>MTEF - Agent Portal</title>
     <style>
-        body { background-color: #0b0f19; color: #fff; font-family: sans-serif; padding: 20px; }
-        .card { background: #1a2235; max-width: 450px; margin: auto; padding: 25px; border-radius: 12px; border-top: 4px solid #f5b041; }
-        h2 { text-align: center; color: #f5b041; }
-        .section { background: #2a354f; padding: 20px; border-radius: 8px; margin-top: 20px; }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; }
-        button { background: #f5b041; color: #000; font-weight: bold; cursor: pointer; }
-        .logout { background: #e74c3c; color: #fff; margin-top: 20px; }
+        body { background-color: #0b0f19; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .box { background-color: #1a2235; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); margin-bottom: 15px; }
+        h2 { text-align: center; color: #f5b041; margin-bottom: 20px; }
+        h3 { color: #fff; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: none; box-sizing: border-box; }
+        input { background-color: #fff; color: #000; font-weight: 500; }
+        button { font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-save { background-color: #f5b041; color: #000; }
+        .btn-logout { background-color: #e74c3c; color: white; }
+        
+        /* Dashboard UI - Starting me ise hide karke rakhenge */
+        #dashboard-section { display: none; }
+        
+        .stats-card { background-color: #2a354f; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; border: 1px solid #3e4b6e; }
+        .stats-card h4 { margin: 0; color: #f5b041; font-size: 28px; }
+        .stats-card p { margin: 5px 0 0 0; color: #ccc; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div class="card">
+    
+    <div>
         <h2>AGENT PORTAL</h2>
-        <div class="section">
+
+        <div class="box" id="bank-section">
             <h3>🏦 Bank Account Details</h3>
-            <input type="text" id="bName" placeholder="Bank Name">
-            <input type="text" id="aHolder" placeholder="Account Holder Name">
-            <input type="number" id="aNum" placeholder="Account Number">
+            <input type="text" id="bankName" placeholder="Bank Name (e.g., SBI)">
+            <input type="text" id="accHolder" placeholder="Account Holder Name">
+            <input type="number" id="accNumber" placeholder="Account Number">
             <input type="text" id="ifsc" placeholder="IFSC Code">
-            <button onclick="updateBank()">Save Bank Details</button>
+            
+            <button class="btn-save" onclick="saveBankDetails()">Save Bank Details</button>
         </div>
-        <button class="logout" onclick="location.href='index.html'">Logout</button>
+
+        <div class="box" id="dashboard-section">
+            <h3>📊 Agent Dashboard</h3>
+            <p style="color: #2ecc71; text-align: center; font-weight: bold;">✔ Bank Verified</p>
+            
+            <div class="stats-card">
+                <h4>₹ 0.00</h4>
+                <p>Total Earnings</p>
+            </div>
+            
+            <div class="stats-card">
+                <h4>0</h4>
+                <p>Customers Added</p>
+            </div>
+
+            <button class="btn-save" style="margin-top: 20px; background-color: #3498db; color: white;" onclick="alert('Client Management Feature Coming Soon!')">➕ Add New Client</button>
+        </div>
+
+        <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
 
     <script>
-        async function updateBank() {
-            const session = localStorage.getItem('userSession');
-            const data = {
-                email: session,
-                bankName: document.getElementById('bName').value,
-                accHolder: document.getElementById('aHolder').value,
-                accNumber: document.getElementById('aNum').value,
-                ifsc: document.getElementById('ifsc').value
-            };
+        // अगर बैंक डिटेल पहले ही सेव हो चुकी है, तो सीधा डैशबोर्ड दिखाओ
+        if(localStorage.getItem('bankSaved') === 'true') {
+            document.getElementById('bank-section').style.display = 'none';
+            document.getElementById('dashboard-section').style.display = 'block';
+        }
+
+        async function saveBankDetails() {
+            const bankName = document.getElementById('bankName').value;
+            const accHolder = document.getElementById('accHolder').value;
+            const accNumber = document.getElementById('accNumber').value;
+            const ifsc = document.getElementById('ifsc').value;
+
+            if(!bankName || !accHolder || !accNumber || !ifsc) {
+                return alert("Please fill all bank details!");
+            }
+
+            // यूजर की पहचान के लिए मोबाइल नंबर या ईमेल
+            const userEmail = localStorage.getItem('userEmail') || prompt("Security Verification: Please enter your login Mobile Number:");
+            if(!userEmail) return;
+
+            // डाटा सर्वर पर भेजना
             const res = await fetch('/api/add-bank', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: userEmail, bankName, accHolder, accNumber, ifsc })
             });
-            const result = await res.json();
-            alert(result.message);
+            
+            const data = await res.json();
+            alert(data.message);
+            
+            if(data.success) {
+                // जादू: बैंक फॉर्म छुपाओ, और डैशबोर्ड दिखाओ!
+                document.getElementById('bank-section').style.display = 'none';
+                document.getElementById('dashboard-section').style.display = 'block';
+                
+                // ब्राउज़र में याद रखने के लिए सेव कर लो (ताकि बार-बार फॉर्म ना मांगे)
+                localStorage.setItem('bankSaved', 'true');
+            }
+        }
+
+        function logout() {
+            localStorage.clear(); // सारा सेव डाटा हटा दो
+            window.location.href = "index.html"; // लॉगिन पेज पर वापस
         }
     </script>
 </body>
