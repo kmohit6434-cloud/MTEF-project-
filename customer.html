@@ -3,243 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTEF Customer Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Customer Portal - MTEF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #050b14; color: #ffffff; overflow-x: hidden; }
-        .glass-effect { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
-        .green-glow { text-shadow: 0 0 15px rgba(34, 197, 94, 0.6); }
-        .digital-ring { position: relative; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
-        .digital-ring::before { content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid transparent; border-top-color: #3B82F6; border-right-color: #3B82F6; animation: spin 3s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .profile-logo { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.15); z-index: 10; }
-        .progress-bar { height: 8px; border-radius: 10px; background: rgba(255,255,255,0.1); overflow: hidden; position: relative; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); box-shadow: 0 0 15px rgba(34, 197, 94, 0.5); width: 65%; }
-        .nav-active { color: #4ade80; font-weight: bold; transform: scale(1.1); transition: 0.3s; text-shadow: 0 0 10px rgba(34,197,94,0.5); }
-        .nav-inactive { color: #6b7280; transition: 0.3s; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { margin: 0; background-color: #0b0f19; color: #fff; font-family: 'Inter', sans-serif; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #1e293b; margin-bottom: 20px; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #3498db; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; color: #3498db; background: rgba(52,152,219,0.1); }
+        .user-info h2 { margin: 0; font-size: 18px; font-weight: 700; text-transform: capitalize; }
+        .user-info p { margin: 4px 0 0 0; font-size: 11px; color: #2ecc71; font-weight: bold; background: rgba(46,204,113,0.1); padding: 2px 8px; border-radius: 4px; display: inline-block; letter-spacing: 1px; }
+        .card { background-color: #121826; border-radius: 16px; padding: 25px; border: 1px solid #1e293b; text-align: center; margin-top: 20px; }
     </style>
 </head>
-<body class="p-4 pb-24 max-w-md mx-auto">
-    
-    <div class="flex justify-between items-center mb-8 pt-2">
-        <div class="flex items-center space-x-4">
-            <div class="digital-ring"><img src="mtef-logo.jpg" alt="Logo" class="profile-logo" onerror="this.src='https://ui-avatars.com/api/?name=Customer&background=3B82F6&color=fff'"></div>
-            <div>
-                <h1 class="text-xl font-bold text-white tracking-wide">My Project</h1>
-                <p class="text-[10px] text-blue-400 uppercase tracking-widest flex items-center mt-1">Client Dashboard | MTEF</p>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="avatar" id="user-avatar">CU</div>
+            <div class="user-info">
+                <h2 id="user-name">Loading...</h2>
+                <p id="user-id">ID: MTEF@----</p>
             </div>
         </div>
-        <button onclick="logout()" class="text-gray-500 hover:text-red-500 text-xl transition"><i class="fas fa-power-off"></i></button>
+        <i class="fa-solid fa-power-off" style="color:#e74c3c; font-size:24px; cursor:pointer;" onclick="logout()"></i>
     </div>
 
-    <div id="tabProject" class="block">
-        <div class="glass-effect p-6 rounded-3xl mb-6 border-t-2 border-green-500 relative overflow-hidden">
-            <div class="absolute -top-4 -right-4 p-2 opacity-5 text-green-500 text-7xl"><i class="fas fa-rocket"></i></div>
-            <h3 class="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Current Status</h3>
-            <h2 class="text-2xl font-bold text-green-400 green-glow mb-6">Development Phase</h2>
-            <div class="progress-bar mb-2"><div class="progress-fill"></div></div>
-            <div class="flex justify-between mt-2">
-                <span class="text-[10px] text-gray-500">Started</span><span class="text-[10px] text-green-400 font-bold tracking-wider animate-pulse">65% COMPLETED</span><span class="text-[10px] text-gray-500">Go Live</span>
-            </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="glass-effect p-5 rounded-3xl border-t-2 border-blue-500 shadow-lg"><p class="text-[10px] text-gray-400 uppercase mb-1">Advance Paid</p><h2 class="text-xl font-bold text-white">₹5,000</h2></div>
-            <div class="glass-effect p-5 rounded-3xl border-t-2 border-amber-500 shadow-lg"><p class="text-[10px] text-gray-400 uppercase mb-1">Balance Due</p><h2 class="text-xl font-bold text-amber-500">₹7,500</h2></div>
-        </div>
-        <div class="glass-effect p-6 rounded-3xl mb-6">
-            <h3 class="text-xs font-bold text-gray-300 mb-4 uppercase tracking-widest border-b border-gray-800 pb-2">Plan Details</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Selected Service</span><span class="text-sm font-bold text-white">Website / App</span></div>
-                <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Delivery Date</span><span class="text-sm font-bold text-blue-400">Under Process</span></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="tabInvoices" class="hidden">
-        <h3 class="text-sm font-bold text-white mb-4 uppercase tracking-widest border-b-2 border-blue-500 pb-1"><i class="fas fa-file-invoice-dollar mr-2 text-blue-500"></i> My Invoices & Payments</h3>
-        
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <button onclick="openModal('paymentModal')" class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(34,197,94,0.3)] transition flex flex-col items-center justify-center">
-                <i class="fas fa-wallet text-xl mb-1"></i> <span class="text-xs">Add Payment</span>
-            </button>
-            <button onclick="downloadInvoice()" class="glass-effect border border-blue-500/50 text-blue-400 hover:bg-blue-600 hover:text-white font-bold py-3 rounded-xl transition flex flex-col items-center justify-center">
-                <i class="fas fa-download text-xl mb-1"></i> <span class="text-xs">Get Slips</span>
-            </button>
-        </div>
-
-        <div class="glass-effect p-5 rounded-3xl mb-4 border-l-4 border-green-500 shadow-lg relative overflow-hidden">
-            <div class="absolute -top-2 -right-2 p-2 opacity-10 text-green-500 text-5xl"><i class="fas fa-check-circle"></i></div>
-            <div class="flex justify-between items-center mb-2"><div><h4 class="font-bold text-white text-lg">Advance Payment</h4><p class="text-[10px] text-gray-400 mt-1">INV-2026-001</p></div><h3 class="text-xl font-bold text-white">₹5,000</h3></div>
-            <div class="mt-4 pt-3 border-t border-gray-700/50 flex justify-between items-center">
-                <span class="text-[10px] text-gray-400"><i class="fas fa-calendar-alt mr-1"></i> Paid Date: 01 May 2026</span><span class="bg-green-500/20 text-green-400 text-[10px] px-3 py-1 rounded-full border border-green-500/30 font-bold">PAID</span>
-            </div>
-        </div>
-
-        <div class="glass-effect p-5 rounded-3xl mb-4 border-l-4 border-amber-500 shadow-lg relative overflow-hidden">
-            <div class="absolute -top-2 -right-2 p-2 opacity-10 text-amber-500 text-5xl"><i class="fas fa-exclamation-circle"></i></div>
-            <div class="flex justify-between items-center mb-2"><div><h4 class="font-bold text-white text-lg">Final Settlement</h4><p class="text-[10px] text-gray-400 mt-1">Pending Generation</p></div><h3 class="text-xl font-bold text-amber-500">₹7,500</h3></div>
-            <div class="mt-4 pt-3 border-t border-gray-700/50 flex justify-between items-center">
-                <span class="text-[10px] text-gray-400"><i class="fas fa-clock mr-1"></i> Due before Go-Live</span><span class="bg-amber-500/20 text-amber-400 text-[10px] px-3 py-1 rounded-full border border-amber-500/30 font-bold animate-pulse">PENDING</span>
-            </div>
-        </div>
-    </div>
-
-    <div id="tabGuidelines" class="hidden">
-        <h3 class="text-sm font-bold text-amber-400 mb-4 uppercase tracking-widest border-b-2 border-amber-500 pb-1"><i class="fas fa-book-open mr-2"></i> MTEF Guidelines</h3>
-        <div class="glass-effect p-6 rounded-3xl space-y-5">
-            <div class="flex items-start space-x-3"><div class="w-8 h-8 rounded-full bg-green-500/20 flex-shrink-0 flex items-center justify-center text-green-400 border border-green-500/50"><i class="fas fa-bolt text-sm"></i></div><div><h4 class="text-sm font-bold text-white">Fast & Secure Delivery</h4><p class="text-[10px] text-gray-400 mt-1">Aapka project hamari priority hai. Ise tay samay (deadline) se pehle aur top quality ke sath pura kiya jayega.</p></div></div>
-            <div class="flex items-start space-x-3 pt-3 border-t border-gray-700/50"><div class="w-8 h-8 rounded-full bg-blue-500/20 flex-shrink-0 flex items-center justify-center text-blue-400 border border-blue-500/50"><i class="fab fa-whatsapp text-sm"></i></div><div><h4 class="text-sm font-bold text-white">WhatsApp Support Only</h4><p class="text-[10px] text-gray-400 mt-1">Kisi bhi samasya ya update ke liye sirf niche diye 'Support' button par click karke Admin ko WhatsApp message karein. <b>(Direct Calling allowed nahi hai)</b>.</p></div></div>
-            <div class="flex items-start space-x-3 pt-3 border-t border-gray-700/50"><div class="w-8 h-8 rounded-full bg-amber-500/20 flex-shrink-0 flex items-center justify-center text-amber-400 border border-amber-500/50"><i class="fas fa-rupee-sign text-sm"></i></div><div><h4 class="text-sm font-bold text-white">Payment Policy</h4><p class="text-[10px] text-gray-400 mt-1">Project shuru karne ke liye Advance payment anivarya hai. Bacha hua payment project 'Live' hone se thik pehle clear karna hoga.</p></div></div>
-        </div>
-        <div class="bg-blue-600/10 border border-blue-500/20 p-5 rounded-3xl mt-6 flex flex-col items-center text-center"><h4 class="text-sm font-bold mb-1">Need Assistance?</h4><p class="text-[10px] text-gray-400 mb-4">Click below to message Admin directly.</p><button onclick="window.open('https://wa.me/918000130580?text=Hello%20MTEF%20Admin,%20I%20need%20help%20regarding%20my%20project.', '_blank')" class="w-full bg-gradient-to-r from-[#25D366] to-[#1ebd5a] text-white font-bold py-3 rounded-xl shadow-lg transition active:scale-95 flex justify-center items-center"><i class="fab fa-whatsapp text-xl mr-2"></i> WhatsApp Support</button></div>
-    </div>
-
-    <div id="tabSettings" class="hidden">
-        <h3 class="text-sm font-bold text-white mb-4 uppercase tracking-widest border-b-2 border-gray-500 pb-1"><i class="fas fa-cog mr-2 text-gray-400"></i> Account Settings</h3>
-        <div class="glass-effect p-6 rounded-3xl mb-6 flex items-center space-x-4"><div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-2xl font-bold text-white border-2 border-white/20">CU</div><div><h4 class="font-bold text-white text-xl">Customer Profile</h4><p class="text-xs text-gray-400 mt-1">MTEF Verified Client <i class="fas fa-check-circle text-blue-400 ml-1"></i></p></div></div>
-        <div class="space-y-3">
-            <div onclick="openModal('editProfileModal')" class="glass-effect p-4 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/5 transition border border-transparent hover:border-gray-600"><div class="flex items-center space-x-3"><div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-user-edit"></i></div><span class="text-sm font-bold text-white">Edit Profile</span></div><i class="fas fa-chevron-right text-gray-500 text-xs"></i></div>
-            <div onclick="openModal('changePasswordModal')" class="glass-effect p-4 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/5 transition border border-transparent hover:border-gray-600"><div class="flex items-center space-x-3"><div class="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400"><i class="fas fa-key"></i></div><span class="text-sm font-bold text-white">Change Password</span></div><i class="fas fa-chevron-right text-gray-500 text-xs"></i></div>
-            <div onclick="logout()" class="glass-effect p-4 rounded-xl flex justify-between items-center cursor-pointer hover:bg-red-500/10 transition border border-transparent hover:border-red-500/30 mt-6"><div class="flex items-center space-x-3"><div class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-400"><i class="fas fa-sign-out-alt"></i></div><span class="text-sm font-bold text-red-400">Secure Logout</span></div></div>
-        </div>
-    </div>
-
-    <div id="paymentModal" class="modal p-4">
-        <div class="glass-effect w-full p-6 rounded-3xl border border-green-500/50 shadow-[0_0_40px_rgba(34,197,94,0.2)] relative overflow-hidden">
-            <div class="flex justify-between items-start mb-6"><h2 class="text-xl font-bold text-green-400"><i class="fas fa-shield-alt mr-2"></i> Secure Payment</h2><button onclick="closeModal('paymentModal')" class="text-gray-400 text-2xl hover:text-red-400"><i class="fas fa-times-circle"></i></button></div>
-            <div class="bg-black/50 p-6 rounded-2xl text-center border border-gray-700 mb-6 flex flex-col items-center">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3D8000130580-5%40ibl%26pn%3DMTEF" alt="MTEF Payment QR" class="w-48 h-48 mb-4 border-4 border-white rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">MTEF Official UPI</p><h3 class="text-lg font-bold text-white tracking-wider">8000130580-5@ibl</h3>
-            </div>
-            <p class="text-[10px] text-gray-500 text-center mb-6">MTEF Official QR Code ko scan karein ya UPI ID use karein. Payment ke baad, kripya Admin ko WhatsApp par Screenshot bhej dein.</p>
-            <button onclick="submitPayment()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl transition shadow-lg flex justify-center items-center"><i class="fas fa-check-circle mr-2"></i> Done, I have Paid</button>
-        </div>
-    </div>
-
-    <div id="editProfileModal" class="modal p-4">
-        <div class="glass-effect w-full p-6 rounded-3xl border border-blue-500/50 shadow-[0_0_40px_rgba(59,130,246,0.2)]">
-            <div class="flex justify-between items-start mb-6"><h2 class="text-xl font-bold text-white"><i class="fas fa-user-edit mr-2 text-blue-400"></i> Edit Profile</h2><button onclick="closeModal('editProfileModal')" class="text-gray-400 text-2xl hover:text-red-400"><i class="fas fa-times-circle"></i></button></div>
-            <div class="space-y-4 mb-6"><div><label class="text-[10px] text-gray-400 uppercase">Full Name</label><input type="text" placeholder="Your Name" class="w-full bg-[#0a0f1e] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-blue-500"></div><div><label class="text-[10px] text-gray-400 uppercase">Mobile Number</label><input type="tel" placeholder="Your Number" class="w-full bg-[#0a0f1e] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-blue-500"></div></div>
-            <button onclick="saveProfile()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition shadow-lg">Save Changes</button>
-        </div>
-    </div>
-
-    <div id="changePasswordModal" class="modal p-4">
-        <div class="glass-effect w-full p-6 rounded-3xl border border-amber-500/50 shadow-[0_0_40px_rgba(245,158,11,0.2)]">
-            <div class="flex justify-between items-start mb-6"><h2 class="text-xl font-bold text-white"><i class="fas fa-key mr-2 text-amber-400"></i> Change Password</h2><button onclick="closeModal('changePasswordModal')" class="text-gray-400 text-2xl hover:text-red-400"><i class="fas fa-times-circle"></i></button></div>
-            <div class="space-y-4 mb-6"><div><label class="text-[10px] text-gray-400 uppercase">New Password</label><input type="password" placeholder="Enter new password" class="w-full bg-[#0a0f1e] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-amber-500"></div><div><label class="text-[10px] text-gray-400 uppercase">Confirm Password</label><input type="password" placeholder="Confirm password" class="w-full bg-[#0a0f1e] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-amber-500"></div></div>
-            <button onclick="savePassword()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-4 rounded-xl transition shadow-lg">Update Password</button>
-        </div>
-    </div>
-
-    <div class="fixed bottom-0 left-0 w-full glass-effect border-t border-gray-700/50 p-4 flex justify-around items-center z-50 bg-[#050b14]/95 pb-6">
-        <div id="navProject" onclick="switchTab('Project')" class="flex flex-col items-center nav-active cursor-pointer"><i class="fas fa-project-diagram text-xl mb-1"></i><span class="text-[10px]">Project</span></div>
-        <div id="navInvoices" onclick="switchTab('Invoices')" class="flex flex-col items-center nav-inactive cursor-pointer"><i class="fas fa-file-invoice-dollar text-xl mb-1"></i><span class="text-[10px]">Invoices</span></div>
-        <div id="navGuidelines" onclick="switchTab('Guidelines')" class="flex flex-col items-center nav-inactive cursor-pointer"><i class="fas fa-book-open text-xl mb-1"></i><span class="text-[10px]">Guidelines</span></div>
-        <div id="navSettings" onclick="switchTab('Settings')" class="flex flex-col items-center nav-inactive cursor-pointer"><i class="fas fa-cog text-xl mb-1"></i><span class="text-[10px]">Settings</span></div>
+    <div class="card">
+        <i class="fa-solid fa-laptop-code" style="font-size: 50px; color: #3498db; margin-bottom: 15px;"></i>
+        <h3 style="margin: 0 0 10px 0;">Welcome to MTEF Services</h3>
+        <p style="color: #64748b; font-size: 14px;">Aapka project abhi process me hai. Support ke liye admin se sampark karein.</p>
+        <button style="background: #3498db; color: white; border: none; padding: 12px 20px; border-radius: 8px; margin-top: 15px; font-weight: bold; width: 100%; cursor: pointer;" onclick="alert('Admin WhatsApp Opening...')"><i class="fa-brands fa-whatsapp"></i> Chat with Support</button>
     </div>
 
     <script>
-        function switchTab(tab) {
-            ['Project', 'Invoices', 'Guidelines', 'Settings'].forEach(t => {
-                document.getElementById('tab' + t).style.display = 'none';
-                document.getElementById('nav' + t).className = 'flex flex-col items-center nav-inactive cursor-pointer';
-            });
-            document.getElementById('tab' + tab).style.display = 'block';
-            document.getElementById('nav' + tab).className = 'flex flex-col items-center nav-active cursor-pointer';
+        window.onload = function() {
+            const name = localStorage.getItem('userName') || "Customer User";
+            const id = localStorage.getItem('userId') || "MTEF@0000";
+            document.getElementById('user-avatar').innerText = name.substring(0, 2).toUpperCase();
+            document.getElementById('user-name').innerText = name;
+            document.getElementById('user-id').innerText = `ID: ${id}`;
         }
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function submitPayment() { alert('✅ Payment Notification sent to Admin. We will verify your transaction shortly.'); closeModal('paymentModal'); }
-        function saveProfile() { alert('✅ Profile Details Updated Successfully!'); closeModal('editProfileModal'); }
-        function savePassword() { alert('🔐 Password Updated Successfully!'); closeModal('changePasswordModal'); }
-        function logout() { if(confirm('Are you sure you want to securely logout?')) { window.location.href = '/'; } }
-
-        function downloadInvoice() {
-            const printWindow = window.open('', '_blank');
-            const today = new Date().toLocaleDateString();
-            const htmlCode = `
-                <html>
-                <head>
-                    <title>MTEF Official Invoice</title>
-                    <style>
-                        body { font-family: 'Arial', sans-serif; padding: 40px; color: #111; max-width: 800px; margin: auto; }
-                        .header { text-align: center; border-bottom: 3px solid #F59E0B; padding-bottom: 20px; margin-bottom: 30px; }
-                        .header h1 { color: #F59E0B; font-size: 36px; margin: 0; }
-                        .header p { margin: 5px 0; color: #555; }
-                        .title { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; }
-                        .details-box { display: flex; justify-content: space-between; margin-bottom: 30px; background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #eee; }
-                        .details p { margin: 5px 0; }
-                        .table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
-                        .table th, .table td { border: 1px solid #ddd; padding: 15px; text-align: left; }
-                        .table th { background-color: #F59E0B; color: white; }
-                        .total-row { font-weight: bold; background: #f4f4f4; }
-                        .status-paid { color: #22c55e; font-weight: bold; }
-                        .status-pending { color: #F59E0B; font-weight: bold; }
-                        .footer { text-align: center; margin-top: 50px; font-size: 14px; color: #777; border-top: 1px solid #ddd; padding-top: 20px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>MTEF</h1>
-                        <p>Master Tech Education Foundation</p>
-                        <p>Contact: 8000130580 | Email: admin@mtef.com</p>
-                    </div>
-                    <div class="title">Official Payment Receipt</div>
-                    
-                    <div class="details-box">
-                        <div class="details">
-                            <p><strong>Billed To:</strong> MTEF Verified Client</p>
-                            <p><strong>Project:</strong> Website / App Development</p>
-                        </div>
-                        <div class="details">
-                            <p><strong>Date:</strong> ${today}</p>
-                            <p><strong>Invoice No:</strong> INV-2026-001</p>
-                        </div>
-                    </div>
-
-                    <table class="table">
-                        <tr>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                        </tr>
-                        <tr>
-                            <td>Project Advance Payment</td>
-                            <td>₹5,000</td>
-                            <td class="status-paid">PAID</td>
-                        </tr>
-                        <tr>
-                            <td>Final Delivery Settlement</td>
-                            <td>₹7,500</td>
-                            <td class="status-pending">PENDING</td>
-                        </tr>
-                        <tr class="total-row">
-                            <td>Total Project Cost</td>
-                            <td>₹12,500</td>
-                            <td></td>
-                        </tr>
-                    </table>
-
-                    <div class="footer">
-                        <p><strong>Note:</strong> Pending balance must be cleared before the project goes live.</p>
-                        <p>Official UPI ID: <strong>8000130580-5@ibl</strong></p>
-                        <p>Thank you for doing business with MTEF!</p>
-                    </div>
-
-                    <script>
-                        window.onload = function() { window.print(); }
-                    <\/script>
-                </body>
-                </html>
-            `;
-            printWindow.document.write(htmlCode);
-            printWindow.document.close();
-        }
+        function logout() { localStorage.clear(); window.location.href = "index.html"; }
     </script>
 </body>
 </html>

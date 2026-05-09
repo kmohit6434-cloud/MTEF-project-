@@ -7,24 +7,45 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { margin: 0; background-color: #0b0f19; color: #fff; font-family: 'Inter', sans-serif; padding-bottom: 70px; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background-color: #121826; border-bottom: 1px solid #1e293b; }
+        body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Inter', sans-serif; padding-bottom: 70px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background-color: #0b0f19; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1a2235; }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #f5b041; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; color: #f5b041; background: rgba(245, 176, 65, 0.1); }
-        
-        /* NAME AND ID STYLES */
-        .agent-info h2 { margin: 0; font-size: 18px; font-weight: 700; color: #fff; text-transform: capitalize; }
-        .agent-info p { margin: 4px 0 0 0; font-size: 12px; color: #3498db; letter-spacing: 1px; font-weight: bold; background: rgba(52, 152, 219, 0.1); padding: 2px 8px; border-radius: 4px; display: inline-block; }
-        
+        .agent-info h2 { margin: 0; font-size: 18px; font-weight: 700; text-transform: capitalize; }
+        .agent-info p { margin: 4px 0 0 0; font-size: 11px; color: #3498db; font-weight: bold; background: rgba(52,152,219,0.1); padding: 2px 8px; border-radius: 4px; display: inline-block; letter-spacing: 1px; }
         .logout-btn { color: #e74c3c; font-size: 24px; cursor: pointer; }
-        .page { display: none; padding: 20px; }
+
+        .page { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
-        .card { background-color: #121826; border-radius: 12px; padding: 20px; border: 1px solid #1e293b; margin-bottom: 15px; }
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background-color: #0b0f19; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #1e293b; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #64748b; font-size: 11px; font-weight: 500; cursor: pointer; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .row { display: flex; gap: 15px; margin-bottom: 20px; }
+        .card { background-color: #121826; border-radius: 16px; padding: 20px; border: 1px solid #1e293b; flex: 1; }
+        .card-green { border-color: #2ecc71; }
+        .card-blue { border-color: #3498db; }
+        .card-title { font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px; }
+        .card-value { font-size: 28px; font-weight: 700; margin: 0; }
+        .text-green { color: #2ecc71; }
+        .text-blue { color: #3498db; }
+
+        .action-card { background-color: #121826; border-radius: 20px; padding: 30px 20px; text-align: center; border: 1px solid #1e293b; margin-top: 20px; }
+        .action-card i { font-size: 40px; color: #64748b; margin-bottom: 15px; }
+
+        .section-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #3498db; padding-bottom: 10px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+        .input-group input, .input-group select { width: 100%; background-color: #0b0f19; border: 1px solid #1e293b; color: #fff; padding: 14px; border-radius: 8px; box-sizing: border-box; }
+        
+        .btn-primary { width: 100%; background-color: #2563eb; color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .btn-green { background-color: #16a34a; }
+        
+        .support-item { background-color: #121826; border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; gap: 15px; border: 1px solid #1e293b; }
+        .icon-box { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; flex-shrink: 0; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #0b0f19; display: flex; justify-content: space-around; padding: 12px 0 20px 0; border-top: 1px solid #1e293b; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #64748b; cursor: pointer; width: 60px; font-size: 11px; }
         .nav-item.active { color: #f5b041; }
-        input, button { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #1e293b; background: #0b0f19; color: white; box-sizing: border-box; }
-        button { background: #f5b041; color: black; font-weight: bold; cursor: pointer; border: none; }
     </style>
 </head>
 <body>
@@ -41,51 +62,76 @@
     </div>
 
     <div id="home" class="page active">
-        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-            <div class="card" style="flex:1; border-left: 4px solid #2ecc71;">
-                <div style="font-size:11px; color:#94a3b8; text-transform:uppercase;">Total Earnings</div>
-                <div style="font-size:24px; font-weight:bold; color:#2ecc71;">₹0</div>
-            </div>
-            <div class="card" style="flex:1; border-left: 4px solid #3498db;">
-                <div style="font-size:11px; color:#94a3b8; text-transform:uppercase;">My Leads</div>
-                <div style="font-size:24px; font-weight:bold; color:#3498db;">0</div>
-            </div>
+        <div class="row">
+            <div class="card card-green"><div class="card-title">Total Earnings</div><div class="card-value text-green">₹0</div></div>
+            <div class="card card-blue"><div class="card-title">My Leads</div><div class="card-value text-blue">0</div></div>
+        </div>
+        <div class="action-card" onclick="switchTab('leads')">
+            <i class="fa-solid fa-chart-line"></i>
+            <h3 style="margin:0 0 10px 0;">Start Adding Leads</h3>
+            <p style="margin:0; color:#64748b; font-size:13px;">Go to the Leads tab to register a new client for MTEF.</p>
+        </div>
+    </div>
+
+    <div id="leads" class="page">
+        <div class="section-title" style="border-color: #3498db; color: #3498db;"><i class="fa-solid fa-user-plus"></i> REGISTER NEW LEAD</div>
+        <div class="card">
+            <div class="input-group"><label>Client Name</label><input type="text" placeholder="Enter full name"></div>
+            <div class="input-group"><label>WhatsApp Number</label><input type="number" placeholder="10-digit number"></div>
+            <div class="input-group"><label>Service</label><select><option>Website Development</option><option>App Development</option></select></div>
+            <button class="btn-primary" onclick="alert('Lead Submission Feature Coming Soon!')">Submit Lead</button>
         </div>
     </div>
 
     <div id="wallet" class="page">
-        <h4 style="color:#f5b041; margin-top:0;"><i class="fa-solid fa-building-columns"></i> UPDATE BANK ACCOUNT</h4>
+        <div class="section-title" style="border-color: #2ecc71; color: #2ecc71;"><i class="fa-solid fa-wallet"></i> WITHDRAW FUNDS</div>
+        <div class="card" style="margin-bottom: 25px;">
+            <div class="input-group"><label>Amount (₹)</label><input type="number" placeholder="Min ₹500"></div>
+            <div class="input-group"><label>Your UPI ID</label><input type="text" placeholder="e.g. yourname@upi"></div>
+            <button class="btn-primary btn-green" onclick="alert('Insufficient Balance!')">Request Payout</button>
+        </div>
+
+        <div class="section-title" style="border-color: #f5b041; color: #f5b041;"><i class="fa-solid fa-building-columns"></i> UPDATE BANK ACCOUNT</div>
         <div class="card">
-            <input type="text" id="bankName" placeholder="Bank Name (e.g., SBI)">
-            <input type="text" id="accHolder" placeholder="Account Holder Name">
-            <input type="number" id="accNumber" placeholder="Account Number">
-            <input type="text" id="ifsc" placeholder="IFSC Code">
-            <button onclick="saveBankDetails()">Save Details</button>
+            <div class="input-group"><input type="text" id="bankName" placeholder="Bank Name (e.g., SBI)"></div>
+            <div class="input-group"><input type="text" id="accHolder" placeholder="Account Holder Name"></div>
+            <div class="input-group"><input type="number" id="accNumber" placeholder="Account Number"></div>
+            <div class="input-group"><input type="text" id="ifsc" placeholder="IFSC Code"></div>
+            <button class="btn-primary" style="background-color: #f5b041; color: #000;" onclick="saveBankDetails()">Save Details</button>
+        </div>
+    </div>
+
+    <div id="support" class="page">
+        <div class="section-title" style="border-color: #f5b041; color: #f5b041;"><i class="fa-solid fa-headset"></i> AGENT SUPPORT & RULES</div>
+        <div class="support-item">
+            <div class="icon-box" style="background:rgba(46,204,113,0.1); color:#2ecc71;">Rs</div>
+            <div><h4 style="margin:0 0 5px 0;">Payout Rules</h4><p style="margin:0; font-size:12px; color:#94a3b8;">Min withdrawal ₹500. Cleared within 24 hours.</p></div>
+        </div>
+        <div class="card" style="text-align:center; margin-top:20px;">
+            <h4 style="margin:0 0 10px 0;">Direct Admin Support</h4>
+            <button class="btn-primary" style="background:#25D366; color:#000;" onclick="alert('Admin WhatsApp Opening...')"><i class="fa-brands fa-whatsapp"></i> Message Admin</button>
         </div>
     </div>
 
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home')" id="nav-home"><i class="fa-solid fa-house" style="font-size:18px;"></i>Home</div>
+        <div class="nav-item" onclick="switchTab('leads')" id="nav-leads"><i class="fa-solid fa-user-group" style="font-size:18px;"></i>Leads</div>
         <div class="nav-item" onclick="switchTab('wallet')" id="nav-wallet"><i class="fa-solid fa-wallet" style="font-size:18px;"></i>Wallet</div>
+        <div class="nav-item" onclick="switchTab('support')" id="nav-support"><i class="fa-solid fa-headset" style="font-size:18px;"></i>Support</div>
     </div>
 
     <script>
-        // 🛑 ON PAGE LOAD: JAISE HI PORTAL KHULEGA NAAM AUR ID SET HO JAYEGI 🛑
         window.onload = function() {
             const name = localStorage.getItem('userName') || "Agent Partner";
-            const id = localStorage.getItem('userId') || "MTEFXXXX";
-            
-            // Avatar me naam ke pehle 2 akshar
+            const id = localStorage.getItem('userId') || "MTEF0000";
             document.getElementById('user-avatar').innerText = name.substring(0, 2).toUpperCase();
-            
-            // Naam aur ID print karo
             document.getElementById('user-name').innerText = name;
             document.getElementById('user-id').innerText = `ID: ${id}`;
         }
 
         function switchTab(tabId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             document.getElementById('nav-' + tabId).classList.add('active');
         }
@@ -99,7 +145,6 @@
                 ifsc: document.getElementById('ifsc').value
             };
             if(!payload.bankName || !payload.accNumber) return alert("Fill required details!");
-
             const res = await fetch('/api/add-bank', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             const data = await res.json();
             alert(data.message);
