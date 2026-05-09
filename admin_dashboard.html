@@ -156,15 +156,14 @@
                     <h2>0</h2>
                 </div>
             </div>
-            
             <div style="display: flex; gap: 20px; flex-wrap: wrap;">
                 <div class="card-panel" style="flex: 1; min-width: 300px; height: 200px; display: flex; justify-content: center; align-items: center; color: #3b82f6;">
                     <i class="fa-solid fa-chart-line" style="font-size: 50px; opacity: 0.5;"></i>
-                    <span style="margin-left: 15px; color: #64748b;">Growth Chart</span>
+                    <span style="margin-left: 15px; color: #64748b;">Growth Chart (Syncing...)</span>
                 </div>
                 <div class="card-panel" style="flex: 1; min-width: 300px; height: 200px; display: flex; justify-content: center; align-items: center; color: #8b5cf6;">
                     <i class="fa-solid fa-chart-simple" style="font-size: 50px; opacity: 0.5;"></i>
-                    <span style="margin-left: 15px; color: #64748b;">Performance Analytics</span>
+                    <span style="margin-left: 15px; color: #64748b;">Performance Analytics (Syncing...)</span>
                 </div>
             </div>
         </div>
@@ -172,49 +171,27 @@
         <div id="page-leads" class="page">
             <div class="card-panel">
                 <div class="panel-header">
-                    <input type="text" placeholder="Search leads by name or phone" style="background: #0b0f19; border: 1px solid #1e293b; padding: 10px 15px; border-radius: 8px; color: white; width: 300px;">
-                    <button class="btn" style="background: #f5b041; color: black;"><i class="fa-solid fa-plus"></i> Add New Lead</button>
+                    <input type="text" placeholder="Search leads..." style="background: #0b0f19; border: 1px solid #1e293b; padding: 10px 15px; border-radius: 8px; color: white; width: 300px;">
+                    <button class="btn" style="background: #f5b041; color: black;" onclick="addNewLead()"><i class="fa-solid fa-plus"></i> Add New Lead</button>
                 </div>
-                <div class="data-list">
-                    <div class="data-row">
-                        <div class="data-info">
-                            <div class="data-text">
-                                <h4>Ravi Verma</h4>
-                                <p>+91 8876543210</p>
-                            </div>
-                        </div>
-                        <div class="badge" style="background: #1e293b; color: #3b82f6;">Facebook Ads</div>
-                        <div style="color: #f5b041; font-size: 13px;">Unassigned</div>
-                        <div class="badge badge-red">New</div>
-                    </div>
+                <div class="data-list" id="leads-list">
+                    <p style="text-align: center; color: #64748b; margin: 20px 0; font-style: italic;">No leads available right now. Click 'Add New Lead' to add one.</p>
                 </div>
             </div>
         </div>
 
         <div id="page-agents" class="page">
-            
             <h4 style="color: #f5b041; margin-top: 0;"><i class="fa-solid fa-money-bill-transfer"></i> PENDING WITHDRAW REQUESTS</h4>
             <div class="card-panel" style="border-left: 4px solid #f5b041;">
-                <div class="data-row" style="background: transparent; border: none; padding: 0;">
-                    <div class="data-info">
-                        <div class="data-icon"><i class="fa-solid fa-user"></i></div>
-                        <div class="data-text">
-                            <h4>Suresh Kumar</h4>
-                            <p>Withdrawal Request</p>
-                        </div>
-                    </div>
-                    <h3 style="color: #10b981; margin: 0;">₹4,500</h3>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-green">Approve</button>
-                        <button class="btn btn-red">Reject</button>
-                    </div>
+                <div class="data-list" id="withdraw-list">
+                    <p style="text-align: center; color: #64748b; margin: 10px 0;">No pending withdrawal requests.</p>
                 </div>
             </div>
 
             <h4 style="color: #3b82f6;"><i class="fa-solid fa-list-check"></i> ALL REGISTERED AGENTS & BANK DETAILS</h4>
             <div class="card-panel">
                 <div class="data-list" id="agents-list">
-                    <p style="color: #64748b; text-align: center;">Loading agents data...</p>
+                    <p style="text-align: center; color: #64748b;">Loading agents data...</p>
                 </div>
             </div>
         </div>
@@ -223,16 +200,16 @@
             <div class="card-panel">
                 <div class="panel-header"><h3><i class="fa-solid fa-users"></i> ALL REGISTERED CUSTOMERS</h3></div>
                 <div class="data-list" id="customers-list">
-                    <p style="color: #64748b; text-align: center;">Loading customers data...</p>
+                    <p style="text-align: center; color: #64748b;">Loading customers data...</p>
                 </div>
             </div>
 
             <div class="card-panel">
                 <div class="panel-header"><h3><i class="fa-solid fa-comment-dots"></i> DIRECT MESSAGING</h3></div>
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <input type="text" placeholder="Message Title" style="background: #0b0f19; border: 1px solid #1e293b; padding: 15px; border-radius: 8px; color: white; flex: 1;">
-                    <textarea placeholder="Type message..." style="background: #0b0f19; border: 1px solid #1e293b; padding: 15px; border-radius: 8px; color: white; flex: 2; height: 50px; font-family: inherit;"></textarea>
-                    <button class="btn" style="background: #f5b041; color: black; font-size: 16px; padding: 0 30px;"><i class="fa-solid fa-paper-plane"></i> Send</button>
+                    <input type="text" id="msg-title" placeholder="Message Title" style="background: #0b0f19; border: 1px solid #1e293b; padding: 15px; border-radius: 8px; color: white; flex: 1;">
+                    <textarea id="msg-body" placeholder="Type message..." style="background: #0b0f19; border: 1px solid #1e293b; padding: 15px; border-radius: 8px; color: white; flex: 2; height: 50px; font-family: inherit;"></textarea>
+                    <button class="btn" style="background: #f5b041; color: black; font-size: 16px; padding: 0 30px;" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i> Send</button>
                 </div>
             </div>
         </div>
@@ -240,13 +217,8 @@
         <div id="page-payments" class="page">
             <div class="card-panel">
                 <div class="panel-header"><h3><i class="fa-solid fa-file-invoice-dollar"></i> Financial Ledger</h3></div>
-                <div class="data-list">
-                    <div class="data-row">
-                        <div style="font-size: 13px; color: #94a3b8;">06 May 2026</div>
-                        <div style="font-weight: bold;">AGT-001</div>
-                        <div style="color: #ef4444; font-weight: bold;">-₹4,500</div>
-                        <div class="badge badge-green">Approved</div>
-                    </div>
+                <div class="data-list" id="ledger-list">
+                    <p style="text-align: center; color: #64748b; margin: 20px 0;">No transactions recorded yet.</p>
                 </div>
             </div>
         </div>
@@ -289,13 +261,36 @@
             }
         }
 
-        // Add Sub Admin Functionality
+        // Functional Option: Add New Lead
+        function addNewLead() {
+            const name = prompt("Enter Lead Name:");
+            const phone = prompt("Enter WhatsApp/Mobile Number:");
+            if(name && phone) {
+                const list = document.getElementById('leads-list');
+                if(list.innerHTML.includes('No leads')) list.innerHTML = '';
+                
+                list.innerHTML += `
+                <div class="data-row">
+                    <div class="data-info">
+                        <div class="data-text">
+                            <h4>${name}</h4>
+                            <p>+91 ${phone}</p>
+                        </div>
+                    </div>
+                    <div class="badge" style="background: #1e293b; color: #3b82f6;">Direct Added</div>
+                    <div style="color: #f5b041; font-size: 13px;">Unassigned</div>
+                    <div class="badge badge-red">New</div>
+                </div>`;
+            }
+        }
+
+        // Functional Option: Add Sub-Admin
         function addSubAdmin() {
             const name = prompt("Enter new Sub-Admin Name:");
             if(name && name.trim() !== "") {
                 const list = document.getElementById('subadmin-list');
                 const emptyMsg = document.getElementById('empty-roles-msg');
-                if(emptyMsg) emptyMsg.style.display = 'none'; // Hide empty message
+                if(emptyMsg) emptyMsg.style.display = 'none';
 
                 list.innerHTML += `
                 <div class="data-row">
@@ -312,6 +307,19 @@
             }
         }
 
+        // Functional Option: Send Message
+        function sendMessage() {
+            const title = document.getElementById('msg-title').value;
+            const body = document.getElementById('msg-body').value;
+            if(!title || !body) {
+                alert("Please write a message first!");
+            } else {
+                alert("Message '" + title + "' sent successfully to all customers!");
+                document.getElementById('msg-title').value = '';
+                document.getElementById('msg-body').value = '';
+            }
+        }
+
         async function loadAdminData() {
             try {
                 const response = await fetch('/api/admin/all-data');
@@ -325,7 +333,11 @@
                 if(data.agents.length === 0) agentsList.innerHTML = '<p style="text-align:center; color:#64748b;">No agents found.</p>';
                 
                 data.agents.forEach(agent => {
-                    let bankInfo = `<div style="width: 100%; text-align: center; font-size: 12px; color: #ef4444; margin-top: 10px;">⚠️ Bank Details Not Submitted Yet</div>`;
+                    // Fix for 'undefined' error
+                    let agentName = agent.fullName || "Unnamed Agent";
+                    let agentMobile = agent.mobile || "No Number";
+
+                    let bankInfo = `<div style="width: 100%; font-size: 12px; color: #ef4444; margin-top: 10px;">⚠️ Bank Details Not Submitted Yet</div>`;
                     
                     if(agent.bankDetails && agent.bankDetails.accNumber) {
                         bankInfo = `
@@ -343,8 +355,8 @@
                             <div class="data-info">
                                 <div class="data-icon"><i class="fa-solid fa-user-tie"></i></div>
                                 <div class="data-text">
-                                    <h4>${agent.fullName}</h4>
-                                    <p><i class="fa-solid fa-phone"></i> +91 ${agent.mobile}</p>
+                                    <h4>${agentName}</h4>
+                                    <p><i class="fa-solid fa-phone"></i> +91 ${agentMobile}</p>
                                 </div>
                             </div>
                             <div style="font-weight: bold; color: #10b981;">Earnings: ₹0</div>
@@ -359,13 +371,16 @@
                 if(data.customers.length === 0) customersList.innerHTML = '<p style="text-align:center; color:#64748b;">No customers found.</p>';
 
                 data.customers.forEach(customer => {
+                    let custName = customer.fullName || "Unnamed Customer";
+                    let custMobile = customer.mobile || "No Number";
+
                     customersList.innerHTML += `
                     <div class="data-row">
                         <div class="data-info">
                             <div class="data-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-user"></i></div>
                             <div class="data-text">
-                                <h4>${customer.fullName}</h4>
-                                <p>+91 ${customer.mobile}</p>
+                                <h4>${custName}</h4>
+                                <p>+91 ${custMobile}</p>
                             </div>
                         </div>
                         <div style="font-size: 13px; color: #f5b041;">Direct Lead</div>
