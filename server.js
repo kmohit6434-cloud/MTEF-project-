@@ -19,17 +19,10 @@ const Agent = mongoose.model('Agent', UserSchema, 'agents');
 mongoose.connect(mongoURI).then(async () => {
     console.log('✅ Connected to MongoDB');
     
-    // 🛑 AUTO CREATE DEFAULT CUSTOMER ACCOUNT 🛑
+    // Auto Customer (Aapka account)
     const exists = await Customer.findOne({ mobile: '7891769227' });
     if (!exists) {
-        await new Customer({
-            fullName: 'Mohit (Direct Customer)',
-            mobile: '7891769227',
-            password: '0580',
-            accountType: 'Customer',
-            userId: 'MTEF@6866'
-        }).save();
-        console.log('✅ Auto-Customer Created (7891769227)');
+        await new Customer({ fullName: 'Mohit (Direct Customer)', mobile: '7891769227', password: '0580', accountType: 'Customer', userId: 'MTEF@6866' }).save();
     }
 }).catch(e => console.log(e));
 
@@ -55,6 +48,7 @@ app.post('/api/send-otp', async (req, res) => {
     } catch (e) { res.json({ success: false, message: "Server Error" }); }
 });
 
+// 📝 NORMAL REGISTRATION (WITH OTP)
 app.post('/api/register', async (req, res) => {
     const { fullName, mobile, password, accountType, otp } = req.body;
     if (tempOTPs[mobile] != otp) return res.json({ success: false, message: 'Invalid OTP!' });
@@ -68,6 +62,29 @@ app.post('/api/register', async (req, res) => {
     res.json({ success: true, message: `Registration Done! Your ID is ${userId}` });
 });
 
+// 👑 ADMIN BYPASS REGISTRATION (NO OTP)
+app.post('/api/admin/create-user', async (req, res) => {
+    try {
+        const { fullName, mobile, password, accountType } = req.body;
+        
+        // Check agar number pehle se registered hai
+        const existingAgent = await Agent.findOne({ mobile });
+        const existingCustomer = await Customer.findOne({ mobile });
+        if (existingAgent || existingCustomer) return res.json({ success: false, message: 'This Mobile Number is already registered!' });
+
+        const randomDigits = Math.floor(1000 + Math.random() * 9000);
+        const userId = accountType === 'Agent' ? `MTEF${randomDigits}` : `MTEF@${randomDigits}`;
+
+        const Model = accountType === 'Agent' ? Agent : Customer;
+        await new Model({ fullName, mobile, password, accountType, userId }).save();
+        
+        res.json({ success: true, message: `Account Created! ID: ${userId}` });
+    } catch (err) {
+        res.json({ success: false, message: 'Server Error: ' + err.message });
+    }
+});
+
+// 🔐 LOGIN API
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     if (email === "MTEF@0580" && password === "Aarav@divyansh@0580") {

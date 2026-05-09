@@ -53,11 +53,13 @@
         .bank-item { flex: 1; min-width: 120px; }
         .bank-item label { display: block; font-size: 10px; color: #3b82f6; text-transform: uppercase; margin-bottom: 3px; font-weight: bold; }
         .bank-item span { font-size: 13px; color: #fff; }
+        .pass-box { background-color: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; letter-spacing: 1px; }
         .menu-toggle { display: none; font-size: 20px; cursor: pointer; color: #fff; margin-right: 15px; }
         
-        /* New Password Box Style */
-        .pass-box { background-color: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; letter-spacing: 1px; }
-        
+        /* New Form Inputs */
+        .form-input { width: 100%; background-color: #0b0f19; border: 1px solid #1e293b; color: #fff; padding: 14px; border-radius: 8px; box-sizing: border-box; margin-top: 8px; }
+        .form-input:focus { outline: none; border-color: #3498db; }
+
         @media (max-width: 768px) {
             .sidebar { position: fixed; height: 100%; transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
@@ -80,6 +82,9 @@
             <div class="nav-item" onclick="switchPage('agents', 'Agent Intelligence & Details')" id="nav-agents"><i class="fa-solid fa-user-tie"></i> Agent Mgmt</div>
             <div class="nav-item" onclick="switchPage('customers', 'Customer Direct Portal')" id="nav-customers"><i class="fa-solid fa-users"></i> Customer Mgmt</div>
             <div class="nav-item" onclick="switchPage('payments', 'Financial Ledger & Sync')" id="nav-payments"><i class="fa-solid fa-wallet"></i> Payments</div>
+            
+            <div class="nav-item" onclick="switchPage('create-user', 'Manual Account Creation')" id="nav-create-user"><i class="fa-solid fa-user-plus"></i> Create User</div>
+            
             <div class="nav-item" onclick="switchPage('roles', 'Security & Roles Management')" id="nav-roles"><i class="fa-solid fa-shield-halved"></i> Roles & Security</div>
         </div>
     </div>
@@ -103,11 +108,6 @@
                 <div class="stat-card border-green"><h3>Total Earnings</h3><h2>₹0</h2></div>
                 <div class="stat-card border-red"><h3>Pending Withdrawals</h3><h2>0</h2></div>
             </div>
-            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                <div class="card-panel" style="flex: 1; min-width: 300px; height: 200px; display: flex; justify-content: center; align-items: center; color: #3b82f6;">
-                    <i class="fa-solid fa-chart-line" style="font-size: 50px; opacity: 0.5;"></i><span style="margin-left: 15px; color: #64748b;">Growth Chart</span>
-                </div>
-            </div>
         </div>
 
         <div id="page-leads" class="page">
@@ -121,28 +121,16 @@
         </div>
 
         <div id="page-agents" class="page">
-            <h4 style="color: #3b82f6;"><i class="fa-solid fa-list-check"></i> ALL REGISTERED AGENTS (WITH PASSWORDS)</h4>
+            <h4 style="color: #3b82f6;"><i class="fa-solid fa-list-check"></i> ALL REGISTERED AGENTS</h4>
             <div class="card-panel">
-                <div class="data-list" id="agents-list">
-                    <p style="text-align: center; color: #64748b;">Loading agents data...</p>
-                </div>
+                <div class="data-list" id="agents-list"><p style="text-align: center; color: #64748b;">Loading agents data...</p></div>
             </div>
         </div>
 
         <div id="page-customers" class="page">
             <div class="card-panel">
-                <div class="panel-header"><h3><i class="fa-solid fa-users"></i> ALL REGISTERED CUSTOMERS (WITH PASSWORDS)</h3></div>
-                <div class="data-list" id="customers-list">
-                    <p style="text-align: center; color: #64748b;">Loading customers data...</p>
-                </div>
-            </div>
-            <div class="card-panel">
-                <div class="panel-header"><h3><i class="fa-solid fa-comment-dots"></i> DIRECT MESSAGING</h3></div>
-                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <input type="text" id="msg-title" placeholder="Message Title" style="background: #0b0f19; border: 1px solid #1e293b; padding: 15px; border-radius: 8px; color: white; flex: 1;">
-                    <textarea id="msg-body" placeholder="Type message..." style="background: #0b0f19; border: 1px solid #1e293b; padding: 15px; border-radius: 8px; color: white; flex: 2; height: 50px; font-family: inherit;"></textarea>
-                    <button class="btn" style="background: #f5b041; color: black; font-size: 16px; padding: 0 30px;" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i> Send</button>
-                </div>
+                <div class="panel-header"><h3><i class="fa-solid fa-users"></i> ALL REGISTERED CUSTOMERS</h3></div>
+                <div class="data-list" id="customers-list"><p style="text-align: center; color: #64748b;">Loading customers data...</p></div>
             </div>
         </div>
 
@@ -150,6 +138,42 @@
             <div class="card-panel">
                 <div class="panel-header"><h3><i class="fa-solid fa-file-invoice-dollar"></i> Financial Ledger</h3></div>
                 <div class="data-list" id="ledger-list"><p style="text-align: center; color: #64748b; margin: 20px 0;">No transactions recorded yet.</p></div>
+            </div>
+        </div>
+
+        <div id="page-create-user" class="page">
+            <div class="card-panel" style="max-width: 500px; margin: 0 auto; border-top: 4px solid #f5b041;">
+                <div class="panel-header">
+                    <div style="text-align: center; width: 100%;">
+                        <i class="fa-solid fa-bolt" style="color: #f5b041; font-size: 30px; margin-bottom: 10px;"></i>
+                        <h3 style="color: #f5b041;">Instant Account Creation (No OTP)</h3>
+                        <p style="font-size: 12px; color: #64748b; margin-top: 5px;">Bypass OTP and create accounts directly for your clients.</p>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Account Type</label>
+                    <select id="new-user-type" class="form-input">
+                        <option value="Customer">Customer</option>
+                        <option value="Agent">Agent</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Full Name</label>
+                    <input type="text" id="new-user-name" class="form-input" placeholder="Enter user's name">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Mobile Number (Login ID)</label>
+                    <input type="number" id="new-user-mobile" class="form-input" placeholder="10-digit mobile number">
+                </div>
+                <div style="margin-bottom: 25px;">
+                    <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Set Password</label>
+                    <input type="text" id="new-user-pass" class="form-input" placeholder="Create a password">
+                </div>
+                
+                <button class="btn" style="background: #f5b041; color: black; font-size: 16px; padding: 15px; width: 100%; border-radius: 8px;" onclick="adminCreateUser()">
+                    <i class="fa-solid fa-user-check"></i> Create Account Instantly
+                </button>
             </div>
         </div>
 
@@ -179,6 +203,35 @@
             if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
         }
 
+        // 👑 NEW: ADMIN CREATE USER FUNCTION
+        async function adminCreateUser() {
+            const accountType = document.getElementById('new-user-type').value;
+            const fullName = document.getElementById('new-user-name').value;
+            const mobile = document.getElementById('new-user-mobile').value;
+            const password = document.getElementById('new-user-pass').value;
+
+            if(!fullName || !mobile || !password) return alert("Please fill all details!");
+            if(mobile.length !== 10) return alert("Please enter valid 10 digit mobile number!");
+
+            const res = await fetch('/api/admin/create-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fullName, mobile, password, accountType })
+            });
+
+            const data = await res.json();
+            alert(data.message);
+            
+            if(data.success) {
+                // Clear inputs
+                document.getElementById('new-user-name').value = '';
+                document.getElementById('new-user-mobile').value = '';
+                document.getElementById('new-user-pass').value = '';
+                // Reload list to show new user immediately
+                loadAdminData(); 
+            }
+        }
+
         async function loadAdminData() {
             try {
                 const response = await fetch('/api/admin/all-data');
@@ -194,34 +247,12 @@
                 data.agents.forEach(agent => {
                     let agentName = agent.fullName || "Unnamed Agent";
                     let agentMobile = agent.mobile || "No Number";
-                    let agentPass = agent.password || "N/A"; // Password Fetch
-
+                    let agentPass = agent.password || "N/A"; 
                     let bankInfo = `<div style="width: 100%; font-size: 12px; color: #ef4444; margin-top: 10px;">⚠️ Bank Details Not Submitted Yet</div>`;
                     if(agent.bankDetails && agent.bankDetails.accNumber) {
-                        bankInfo = `
-                        <div class="bank-box">
-                            <div class="bank-item"><label>Bank Name</label><span>${agent.bankDetails.bankName}</span></div>
-                            <div class="bank-item"><label>A/C Holder</label><span>${agent.bankDetails.accHolder}</span></div>
-                            <div class="bank-item"><label>Account No</label><span>${agent.bankDetails.accNumber}</span></div>
-                            <div class="bank-item"><label>IFSC Code</label><span>${agent.bankDetails.ifsc}</span></div>
-                        </div>`;
+                        bankInfo = `<div class="bank-box"><div class="bank-item"><label>Bank</label><span>${agent.bankDetails.bankName}</span></div><div class="bank-item"><label>A/C Holder</label><span>${agent.bankDetails.accHolder}</span></div><div class="bank-item"><label>Acc No</label><span>${agent.bankDetails.accNumber}</span></div></div>`;
                     }
-
-                    agentsList.innerHTML += `
-                    <div class="data-row" style="flex-direction: column; align-items: stretch;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px;">
-                            <div class="data-info">
-                                <div class="data-icon"><i class="fa-solid fa-user-tie"></i></div>
-                                <div class="data-text">
-                                    <h4>${agentName}</h4>
-                                    <p><i class="fa-solid fa-phone"></i> +91 ${agentMobile}</p>
-                                </div>
-                            </div>
-                            <div class="pass-box"><i class="fa-solid fa-key"></i> Pass: ${agentPass}</div>
-                            <div class="badge badge-green">Active</div>
-                        </div>
-                        ${bankInfo}
-                    </div>`;
+                    agentsList.innerHTML += `<div class="data-row" style="flex-direction: column; align-items: stretch;"><div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px;"><div class="data-info"><div class="data-icon"><i class="fa-solid fa-user-tie"></i></div><div class="data-text"><h4>${agentName}</h4><p><i class="fa-solid fa-phone"></i> +91 ${agentMobile}</p></div></div><div class="pass-box"><i class="fa-solid fa-key"></i> Pass: ${agentPass}</div></div>${bankInfo}</div>`;
                 });
 
                 const customersList = document.getElementById('customers-list');
@@ -231,35 +262,18 @@
                 data.customers.forEach(customer => {
                     let custName = customer.fullName || "Unnamed Customer";
                     let custMobile = customer.mobile || "No Number";
-                    let custPass = customer.password || "N/A"; // Password Fetch
-
-                    customersList.innerHTML += `
-                    <div class="data-row">
-                        <div class="data-info">
-                            <div class="data-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-user"></i></div>
-                            <div class="data-text">
-                                <h4>${custName}</h4>
-                                <p>+91 ${custMobile}</p>
-                            </div>
-                        </div>
-                        <div class="pass-box"><i class="fa-solid fa-key"></i> Pass: ${custPass}</div>
-                        <div class="badge badge-green">Active</div>
-                    </div>`;
+                    let custPass = customer.password || "N/A"; 
+                    customersList.innerHTML += `<div class="data-row"><div class="data-info"><div class="data-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-user"></i></div><div class="data-text"><h4>${custName}</h4><p>+91 ${custMobile}</p></div></div><div class="pass-box"><i class="fa-solid fa-key"></i> Pass: ${custPass}</div></div>`;
                 });
 
             } catch (error) { console.error("Data Load Error:", error); }
         }
 
         function logout() {
-            if(confirm("Logout from Admin Panel?")) {
-                localStorage.clear();
-                window.location.href = "index.html";
-            }
+            if(confirm("Logout from Admin Panel?")) { localStorage.clear(); window.location.href = "index.html"; }
         }
-        
         function addNewLead() { alert("Lead feature in development."); }
         function addSubAdmin() { alert("Sub-Admin feature in development."); }
-        function sendMessage() { alert("Message sent successfully!"); }
 
         loadAdminData();
     </script>
