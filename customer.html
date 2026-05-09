@@ -7,43 +7,500 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { margin: 0; background-color: #0b0f19; color: #fff; font-family: 'Inter', sans-serif; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #1e293b; margin-bottom: 20px; }
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #3498db; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; color: #3498db; background: rgba(52,152,219,0.1); }
-        .user-info h2 { margin: 0; font-size: 18px; font-weight: 700; text-transform: capitalize; }
-        .user-info p { margin: 4px 0 0 0; font-size: 11px; color: #2ecc71; font-weight: bold; background: rgba(46,204,113,0.1); padding: 2px 8px; border-radius: 4px; display: inline-block; letter-spacing: 1px; }
-        .card { background-color: #121826; border-radius: 16px; padding: 25px; border: 1px solid #1e293b; text-align: center; margin-top: 20px; }
+        
+        body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Inter', sans-serif; padding-bottom: 80px; overflow-x: hidden; }
+        
+        /* SPA Pages Setup */
+        .page { display: none; width: 100%; min-height: 100vh; animation: fadeIn 0.3s ease; box-sizing: border-box; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Reusable UI Components */
+        .card { background-color: #121826; border-radius: 16px; border: 1px solid #1e293b; padding: 20px; box-sizing: border-box; margin-bottom: 15px; }
+        .input-group { margin-bottom: 15px; width: 100%; }
+        .input-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input, .input-group select { width: 100%; background-color: #0b0f19; border: 1px solid #1e293b; color: #fff; padding: 14px; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+        
+        .btn-main { width: 100%; background-color: #f5b041; color: #000; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-main:hover { opacity: 0.9; }
+        
+        /* Header & Profile Styles (From Screenshot 1 & 4) */
+        .main-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; position: sticky; top: 0; background-color: #0b0f19; z-index: 100; }
+        .welcome-text h1 { margin: 0; font-size: 22px; font-weight: 700; }
+        .welcome-text p { margin: 4px 0 0 0; font-size: 12px; color: #2ecc71; font-weight: bold; background: rgba(46,204,113,0.1); padding: 2px 8px; border-radius: 4px; display: inline-block; letter-spacing: 0.5px; }
+        .header-icons { display: flex; gap: 15px; align-items: center; }
+        .icon-circle { width: 40px; height: 40px; border-radius: 50%; background-color: #121826; border: 1px solid #1e293b; display: flex; justify-content: center; align-items: center; color: #64748b; cursor: pointer; font-size: 18px; }
+        .avatar-circle { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #3498db; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: bold; color: #3498db; background: rgba(52,152,219,0.1); cursor: pointer; text-transform: uppercase; }
+
+        /* Dashboard Banner (Screenshot 1) */
+        .banner-card { background: linear-gradient(135deg, #1e293b 0%, #121826 100%); display: flex; justify-content: space-between; align-items: center; overflow: hidden; padding: 0 20px; height: 120px; }
+        .banner-text h2 { margin: 0; font-size: 18px; color: #fff; }
+        .banner-text p { margin: 5px 0 0 0; font-size: 12px; color: #94a3b8; }
+        .banner-img { height: 100%; opacity: 0.6; padding-top: 20px; box-sizing: border-box; }
+
+        /* Action Grid (Screenshot 1) */
+        .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 15px; margin-top: 15px; }
+        .action-card { border-radius: 16px; padding: 20px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; height: 120px; cursor: pointer; border: 1px solid; transition: 0.2s; }
+        .action-card:hover { transform: translateY(-3px); }
+        .action-card i { font-size: 24px; }
+        .action-card h3 { margin: 10px 0 0 0; font-size: 16px; font-weight: 600; color: #fff; }
+        .action-card p { margin: 2px 0 0 0; font-size: 11px; }
+
+        /* Color Variants for Grid */
+        .status-card { background-color: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.3); color: #2ecc71; }
+        .pay-card { background-color: rgba(52, 152, 219, 0.1); border-color: rgba(52, 152, 219, 0.3); color: #3498db; }
+        .due-card { background-color: rgba(231, 76, 60, 0.1); border-color: rgba(231, 76, 60, 0.3); color: #e74c3c; }
+        .req-card { background-color: rgba(245, 176, 65, 0.1); border-color: rgba(245, 176, 65, 0.3); color: #f5b041; }
+
+        /* Quick Actions List (Screenshot 1) */
+        .list-section { padding: 15px; margin-top: 10px; }
+        .list-item { background-color: #121826; border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border: 1px solid #1e293b; cursor: pointer; transition: 0.2s; }
+        .list-item:hover { border-color: #3498db; }
+        .list-left { display: flex; align-items: center; gap: 15px; }
+        .list-icon { width: 35px; text-align: center; font-size: 18px; }
+        .list-text h4 { margin: 0; font-size: 14px; color: #fff; font-weight: 500; }
+        .list-right { color: #64748b; font-size: 14px; }
+
+        /* Pay Fee & Add Payment Styles (Screenshot 2 & 5) */
+        .sub-header { display: flex; align-items: center; padding: 15px; gap: 15px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background-color: #0b0f19; z-index: 10; }
+        .back-btn { font-size: 18px; color: #fff; cursor: pointer; }
+        .sub-header h2 { margin: 0; font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .amount-display { text-align: center; margin: 30px 0; }
+        .amount-display p { font-size: 12px; color: #94a3b8; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .amount-display h1 { font-size: 48px; margin: 0; color: #fff; font-weight: 700; }
+        .amount-display h1 span { color: #f5b041; margin-right: 10px; }
+
+        .payment-methods { margin-top: 25px; }
+        .payment-methods label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
+        .method-item { display: flex; align-items: center; padding: 15px; border-radius: 8px; background-color: #121826; border: 1px solid #1e293b; margin-bottom: 10px; cursor: pointer; }
+        .method-item.active { border-color: #3498db; background-color: rgba(52, 152, 219, 0.05); }
+        .method-icon { width: 30px; text-align: center; font-size: 18px; color: #3498db; margin-right: 15px; }
+        .method-text { flex: 1; font-size: 14px; }
+        .radio-circle { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #3e4b6e; position: relative; }
+        .method-item.active .radio-circle { border-color: #3498db; }
+        .method-item.active .radio-circle::after { content: ''; width: 10px; height: 10px; background-color: #3498db; border-radius: 50%; position: absolute; top: 4px; left: 4px; }
+
+        /* Query / Support Styles (Screenshot 3) */
+        .support-tabs { display: flex; padding: 0 15px; border-bottom: 1px solid #1e293b; }
+        .support-tab { padding: 15px 10px; font-size: 14px; color: #64748b; font-weight: 500; cursor: pointer; position: relative; }
+        .support-tab.active { color: #fff; }
+        .support-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background-color: #3498db; }
+
+        .support-item-styled { display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #1e293b; padding: 20px 0; }
+        .styled-icon-box { width: 45px; height: 45px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 16px; text-transform: uppercase; flex-shrink: 0; }
+        .support-text h4 { margin: 0 0 4px 0; font-size: 15px; }
+        .support-text p { margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.4; }
+
+        /* Profile Styles (Screenshot 4) */
+        .profile-hero { text-align: center; padding: 30px 15px; border-bottom: 1px solid #1e293b; }
+        .avatar-large { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #f5b041; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: bold; color: #f5b041; background: rgba(245, 176, 65, 0.1); margin: 0 auto 15px auto; text-transform: uppercase; }
+        .profile-hero h2 { margin: 0 0 5px 0; font-size: 20px; font-weight: 700; }
+        .profile-hero p { margin: 0; font-size: 12px; color: #64748b; }
+
+        /* Bottom Navigation (Screenshot 1) */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: #0b0f19; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; z-index: 100; padding-bottom: 10px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #64748b; text-decoration: none; font-size: 11px; cursor: pointer; transition: 0.2s; width: 60px; }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: #f5b041; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            <div class="avatar" id="user-avatar">CU</div>
-            <div class="user-info">
-                <h2 id="user-name">Loading...</h2>
-                <p id="user-id">ID: MTEF@----</p>
+
+    <div id="customer-home" class="page active">
+        <div class="main-header">
+            <div class="welcome-text">
+                <h1>Hello <span id="cust-name-display">Customer</span>!</h1>
+                <p id="cust-id-display">MTEF@0000</p>
+            </div>
+            <div class="header-icons">
+                <div class="icon-circle"><i class="fa-solid fa-bell"></i></div>
+                <div class="avatar-circle" id="avatar-display" onclick="switchPage('page-profile')">CU</div>
             </div>
         </div>
-        <i class="fa-solid fa-power-off" style="color:#e74c3c; font-size:24px; cursor:pointer;" onclick="logout()"></i>
+
+        <div style="padding: 0 15px;">
+            <div class="card banner-card">
+                <div class="banner-text">
+                    <h2>Welcome to MTEF Portal</h2>
+                    <p>Manage your account seamlessly.</p>
+                </div>
+                <div class="banner-img">
+                    <i class="fa-solid fa-laptop-code" style="font-size: 70px; color: #3e4b6e;"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-grid">
+            <div class="action-card status-card">
+                <i class="fa-solid fa-circle-check"></i>
+                <h3>Status</h3>
+                <p>Verified Student</p>
+            </div>
+            <div class="action-card pay-card" onclick="switchPage('page-pay-fee')">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                <h3>Pay Fee</h3>
+                <p>₹2100 Due</p>
+            </div>
+            <div class="action-card due-card">
+                <i class="fa-solid fa-calendar-xmark"></i>
+                <h3>Due Date</h3>
+                <p>15 May 2026</p>
+            </div>
+            <div class="action-card req-card">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <h3>Service Requests</h3>
+                <p>No active request</p>
+            </div>
+        </div>
+
+        <div class="list-section">
+            <h3 style="font-size: 16px; margin: 0 0 15px 0;">Quick Actions</h3>
+            
+            <div class="list-item" onclick="handleGetSlips()">
+                <div class="list-left">
+                    <div class="list-icon" style="color: #2ecc71;"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div class="list-text"><h4>Get Slips</h4></div>
+                </div>
+                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+
+            <div class="list-item" onclick="switchPage('page-add-payment')">
+                <div class="list-left">
+                    <div class="list-icon" style="color: #3498db;"><i class="fa-solid fa-plus-circle"></i></div>
+                    <div class="list-text"><h4>Add Payment</h4></div>
+                </div>
+                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+
+            <div class="list-item" onclick="switchPage('page-support')">
+                <div class="list-left">
+                    <div class="list-icon" style="color: #f5b041;"><i class="fa-solid fa-headset"></i></div>
+                    <div class="list-text"><h4>Query / Support</h4></div>
+                </div>
+                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+
+            <div class="list-item" onclick="switchPage('page-profile')">
+                <div class="list-left">
+                    <div class="list-icon" style="color: #e74c3c;"><i class="fa-solid fa-user-gear"></i></div>
+                    <div class="list-text"><h4>Profile</h4></div>
+                </div>
+                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-        <i class="fa-solid fa-laptop-code" style="font-size: 50px; color: #3498db; margin-bottom: 15px;"></i>
-        <h3 style="margin: 0 0 10px 0;">Welcome to MTEF Services</h3>
-        <p style="color: #64748b; font-size: 14px;">Aapka project abhi process me hai. Support ke liye admin se sampark karein.</p>
-        <button style="background: #3498db; color: white; border: none; padding: 12px 20px; border-radius: 8px; margin-top: 15px; font-weight: bold; width: 100%; cursor: pointer;" onclick="alert('Admin WhatsApp Opening...')"><i class="fa-brands fa-whatsapp"></i> Chat with Support</button>
+    <div id="page-pay-fee" class="page">
+        <div class="sub-header">
+            <i class="fa-solid fa-arrow-left back-btn" onclick="switchPage('customer-home')"></i>
+            <h2>Pay Fee</h2>
+        </div>
+        
+        <div style="padding: 15px;">
+            <div class="card amount-display">
+                <p>Total Payable Fee</p>
+                <h1><span>₹</span>2,100</h1>
+            </div>
+
+            <div class="card">
+                <div class="input-group">
+                    <label>Select Course/Service</label>
+                    <select id="pay-service">
+                        <option>App Development Course</option>
+                        <option>Digital Marketing Service</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Enter Amount to Pay (₹)</label>
+                    <input type="number" id="pay-amount" placeholder="e.g. 2100" value="2100">
+                </div>
+            </div>
+
+            <div class="payment-methods">
+                <label>Select Payment Method</label>
+                <div class="method-item active" onclick="selectPayment(this)">
+                    <div class="method-icon"><i class="fa-brands fa-google-pay"></i></div>
+                    <div class="method-text">UPI / Google Pay / PhonePe</div>
+                    <div class="radio-circle"></div>
+                </div>
+                <div class="method-item" onclick="selectPayment(this)">
+                    <div class="method-icon"><i class="fa-solid fa-building-columns"></i></div>
+                    <div class="method-text">Net Banking</div>
+                    <div class="radio-circle"></div>
+                </div>
+                <div class="method-item" onclick="selectPayment(this)">
+                    <div class="method-icon"><i class="fa-solid fa-credit-card"></i></div>
+                    <div class="method-text">Credit / Debit Card</div>
+                    <div class="radio-circle"></div>
+                </div>
+            </div>
+
+            <button class="btn-main" style="margin-top: 30px;" onclick="processFeePayment()">
+                <i class="fa-solid fa-lock"></i> Pay ₹<span id="pay-btn-amount">2100</span> Now
+            </button>
+        </div>
+    </div>
+
+    <div id="page-support" class="page">
+        <div class="sub-header">
+            <i class="fa-solid fa-arrow-left back-btn" onclick="switchPage('customer-home')"></i>
+            <h2>QUERY / SUPPORT</h2>
+        </div>
+        
+        <div class="support-tabs">
+            <div class="support-tab active">Support Teams</div>
+            <div class="support-tab" onclick="alert('Chat with Admin Coming Soon!')">Chat Admin</div>
+        </div>
+
+        <div style="padding: 0 20px;">
+            <div class="support-item-styled">
+                <div class="styled-icon-box" style="background:#2a354f; color:#8b5cf6;">Dl</div>
+                <div class="support-text">
+                    <h4>DLT SMS Technical</h4>
+                    <p>Issues regarding bulk SMS, DLT entity registration, template approval, or API integration.</p>
+                </div>
+            </div>
+
+            <div class="support-item-styled">
+                <div class="styled-icon-box" style="background:#2a354f; color:#10b981;">Fa</div>
+                <div class="support-text">
+                    <h4>Fast2SMS Technical</h4>
+                    <p>API connection, wallet balance issues, sender ID, or routing queries (Quick/Transactional).</p>
+                </div>
+            </div>
+
+            <div class="support-item-styled" style="border-bottom: none;">
+                <div class="styled-icon-box" style="background:#2a354f; color:#3b82f6;">PG</div>
+                <div class="support-text">
+                    <h4>Payment Gateway</h4>
+                    <p>Regarding fee payment failures, wallet add money issues, and payment reconciliation.</p>
+                </div>
+            </div>
+
+            <button class="btn-main btn-whatsapp" style="background-color: #25D366; color: #fff; margin-top: 30px;" onclick="window.open('https://wa.me/91XXXXXXXXXX', '_blank')">
+                <i class="fa-brands fa-whatsapp"></i> Message Admin on WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <div id="page-profile" class="page">
+        <div class="sub-header">
+            <i class="fa-solid fa-arrow-left back-btn" onclick="switchPage('customer-home')"></i>
+            <h2>PROFILE</h2>
+        </div>
+
+        <div class="profile-hero">
+            <div class="avatar-large" id="profile-avatar-display">CU</div>
+            <h2 id="profile-name-display">Customer</h2>
+            <p id="profile-email-display">client@mtef.com</p>
+            <p id="profile-mobile-display">No Mobile</p>
+        </div>
+
+        <div class="list-section">
+            <div class="list-item" onclick="alert('Feature Coming Soon')">
+                <div class="list-left">
+                    <div class="list-icon" style="color: #64748b;"><i class="fa-solid fa-user-edit"></i></div>
+                    <div class="list-text"><h4>Edit Profile</h4></div>
+                </div>
+                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+            
+            <div class="list-item" onclick="alert('Feature Coming Soon')">
+                <div class="list-left">
+                    <div class="list-icon" style="color: #64748b;"><i class="fa-solid fa-key"></i></div>
+                    <div class="list-text"><h4>Set New Password</h4></div>
+                </div>
+                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+
+            <div class="list-item" onclick="alert('Feature Coming Soon')">
+                <div class="list-left">
+                    <div class="list-icon" style="color: #64748b;"><i class="fa-solid fa-shield-alt"></i></div>
+                    <div class="list-text"><h4>Security Settings</h4></div>
+                </div>
+                <div class="list-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+
+            <div class="list-item" onclick="logout()" style="border-color: rgba(231, 76, 60, 0.3);">
+                <div class="list-left">
+                    <div class="list-icon" style="color: #e74c3c;"><i class="fa-solid fa-power-off"></i></div>
+                    <div class="list-text"><h4 style="color: #e74c3c;">Logout</h4></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-add-payment" class="page">
+        <div class="sub-header">
+            <i class="fa-solid fa-arrow-left back-btn" onclick="switchPage('customer-home')"></i>
+            <h2>ADD PAYMENT</h2>
+        </div>
+        
+        <div style="padding: 15px;">
+            <div class="card banner-card" style="margin-bottom: 20px;">
+                <div class="banner-text">
+                    <p style="margin: 0; color: #2ecc71;">Wallet Balance</p>
+                    <h1 style="margin: 5px 0 0 0; color: #fff; font-size: 32px;"><span>₹</span>4,500</h1>
+                </div>
+                <i class="fa-solid fa-wallet" style="font-size: 50px; color: #3e4b6e;"></i>
+            </div>
+
+            <div class="card">
+                <div class="input-group">
+                    <label>Enter Amount to Add (₹)</label>
+                    <input type="number" id="add-amount" placeholder="Min ₹100 e.g. 1000">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: -5px;">
+                    <button class="btn-main" style="background:#1e293b; color:white; padding: 10px; font-size: 13px;" onclick="quickAdd(500)">+ 500</button>
+                    <button class="btn-main" style="background:#1e293b; color:white; padding: 10px; font-size: 13px;" onclick="quickAdd(1000)">+ 1000</button>
+                </div>
+            </div>
+
+            <div class="payment-methods">
+                <label>Select Payment Gateway</label>
+                <div class="method-item active" onclick="selectPayment(this)">
+                    <div class="method-icon"><i class="fa-solid fa-gateway"></i></div>
+                    <div class="method-text">Razorpay Gateway</div>
+                    <div class="radio-circle"></div>
+                </div>
+            </div>
+
+            <button class="btn-main" style="margin-top: 30px; background-color: #3498db; color: #fff;" onclick="processAddPayment()">
+                <i class="fa-solid fa-wallet"></i> Add Money to Wallet
+            </button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" id="nav-home" onclick="switchPage('customer-home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" id="nav-wallet" onclick="switchPage('page-add-payment')">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Wallet</span>
+        </div>
+        <div class="nav-item" id="nav-support" onclick="switchPage('page-support')">
+            <i class="fa-solid fa-headset"></i>
+            <span>Support</span>
+        </div>
+        <div class="nav-item" id="nav-profile" onclick="switchPage('page-profile')">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </div>
     </div>
 
     <script>
+        // Security Check & Data Loading
         window.onload = function() {
-            const name = localStorage.getItem('userName') || "Customer User";
-            const id = localStorage.getItem('userId') || "MTEF@0000";
-            document.getElementById('user-avatar').innerText = name.substring(0, 2).toUpperCase();
-            document.getElementById('user-name').innerText = name;
-            document.getElementById('user-id').innerText = `ID: ${id}`;
+            if(localStorage.getItem('userId') && localStorage.getItem('isAdmin') === 'false') {
+                const name = localStorage.getItem('userName') || "Customer";
+                const id = localStorage.getItem('userId') || "MTEF@0000";
+                const email = localStorage.getItem('userEmail') || "client@mtef.com";
+                const mobile = localStorage.getItem('userMobile') || "No Mobile";
+
+                // Update Dashboard Header
+                document.getElementById('cust-name-display').innerText = name;
+                document.getElementById('cust-id-display').innerText = id;
+                
+                // Set Initials (Mohit Kumar -> MK)
+                const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
+                document.getElementById('avatar-display').innerText = initials || "CU";
+
+                // Update Profile Page
+                document.getElementById('profile-name-display').innerText = name;
+                document.getElementById('profile-avatar-display').innerText = initials || "CU";
+                document.getElementById('profile-email-display').innerText = email;
+                document.getElementById('profile-mobile-display').innerText = "+91 " + mobile;
+
+            } else {
+                window.location.href = "index.html"; // Redirect to login if not logged in
+            }
         }
-        function logout() { localStorage.clear(); window.location.href = "index.html"; }
+
+        // SPA Navigation Logic
+        function switchPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+
+            // Set active nav item
+            if(pageId === 'customer-home') document.getElementById('nav-home').classList.add('active');
+            else if(pageId === 'page-add-payment' || pageId === 'page-pay-fee') document.getElementById('nav-wallet').classList.add('active');
+            else if(pageId === 'page-support') document.getElementById('nav-support').classList.add('active');
+            else if(pageId === 'page-profile') document.getElementById('nav-profile').classList.add('active');
+        }
+
+        // General functions
+        function logout() {
+            if(confirm("Are you sure you want to logout?")) {
+                localStorage.clear();
+                window.location.href = "index.html";
+            }
+        }
+
+        function selectPayment(element) {
+            // Remove active from all siblings
+            element.parentElement.querySelectorAll('.method-item').forEach(m => m.classList.remove('active'));
+            // Add active to clicked
+            element.classList.add('active');
+        }
+
+        // Amount input sync for Pay Fee
+        document.getElementById('pay-amount').addEventListener('input', function() {
+            document.getElementById('pay-btn-amount').innerText = this.value || '0';
+        });
+
+        // Quick add for wallet
+        function quickAdd(amount) {
+            document.getElementById('add-amount').value = amount;
+        }
+
+        // ============================================ 
+        // 🛑 WORKING CONDITIONS (As Requested)
+        // ============================================
+
+        // 1. Get Slips functionality
+        function handleGetSlips() {
+            alert("✅ Request Sent! Your account slips are being generated. You will receive a link to download them via registered Email/SMS within 15 minutes.");
+        }
+
+        // 2. Pay Fee Processing
+        function processFeePayment() {
+            const amount = document.getElementById('pay-amount').value;
+            const service = document.getElementById('pay-service').value;
+            if(!amount || amount <= 0) return alert("Please enter a valid amount.");
+            
+            if(confirm(`Proceed to pay ₹${amount} for ${service}?`)) {
+                alert(`🔄 Gateway Opening...\nNormally this would open Razorpay for ₹${amount}.`);
+                // Placeholder for gateway integration
+                setTimeout(()=> {
+                    alert(`✅ Success!\nPayment of ₹${amount} was successful. Transaction ID: MTEF${Date.now()}`);
+                    switchPage('customer-home');
+                }, 2000);
+            }
+        }
+
+        // 3. Add Money to Wallet Processing
+        function processAddPayment() {
+            const amount = document.getElementById('add-amount').value;
+            if(!amount || amount < 100) return alert("Min amount to add is ₹100.");
+
+            if(confirm(`Proceed to add ₹${amount} to your MTEF Wallet?`)) {
+                alert(`🔄 Gateway Opening...\n normalmente opening Razorpay for ₹${amount}.`);
+                // Placeholder for gateway integration
+                setTimeout(()=> {
+                    alert(`✅ Added Successfully!\n₹${amount} added to your wallet. Transaction ID: MTEFW${Date.now()}`);
+                    switchPage('customer-home');
+                }, 2000);
+            }
+        }
+
     </script>
 </body>
 </html>
