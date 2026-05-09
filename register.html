@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MTEF - Registration</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    
     <style>
         body { background-color: #0b0f19; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 20px 0; }
         .box { background-color: #1a2235; padding: 30px; border-radius: 12px; width: 350px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
@@ -15,14 +18,17 @@
         .captcha-txt { background: #2a354f; padding: 10px; border-radius: 6px; color: #f5b041; font-weight: bold; min-width: 60px; text-align: center; }
         .login-link { text-align: center; margin-top: 15px; font-size: 14px; }
         .login-link a { color: #f5b041; text-decoration: none; }
+        #recaptcha-container { margin-top: 10px; display: flex; justify-content: center; }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>REGISTRATION</h2>
         <input type="text" id="name" placeholder="Full Name">
-        <input type="number" id="age" placeholder="Age">
-        <input type="number" id="mobile" placeholder="Mobile Number">
+        <input type="number" id="mobile" placeholder="Mobile Number (10 Digits)">
+        
+        <div id="recaptcha-container"></div>
+        
         <button id="otp-btn" onclick="sendOTP()">Get OTP</button>
         <input type="text" id="otp" placeholder="Enter OTP">
         <input type="password" id="password" placeholder="Set Password">
@@ -42,44 +48,81 @@
     </div>
 
     <script>
+        // Math Captcha Setup
         let n1 = Math.floor(Math.random() * 10) + 1;
         let n2 = Math.floor(Math.random() * 10) + 1;
         document.getElementById('cap-txt').innerText = n1 + " + " + n2;
 
+        // Firebase Initialization
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPM4vMsrvPxBUcNwzNgoqDwWwL_wiHJm8",
+            authDomain: "mtef-9aff8.firebaseapp.com",
+            projectId: "mtef-9aff8",
+            storageBucket: "mtef-9aff8.firebasestorage.app",
+            messagingSenderId: "717904294402",
+            appId: "1:717904294402:web:4beaaFec7966678e99ed1b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Recaptcha Setup
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'invisible'
+        });
+
+        let confirmationResult = null;
+
+        // Send OTP
         async function sendOTP() {
             const mobile = document.getElementById('mobile').value;
             if(mobile.length !== 10) return alert("Enter valid 10-digit number");
             
-            document.getElementById('otp-btn').innerText = 'Sending...';
-            const res = await fetch('/api/send-otp', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ mobile })
-            });
-            const data = await res.json();
-            alert(data.message);
-            document.getElementById('otp-btn').innerText = 'Get OTP';
+            const phoneNumber = "+91" + mobile; 
+            const appVerifier = window.recaptchaVerifier;
+
+            document.getElementById('otp-btn').innerText = 'Sending... Please wait';
+            
+            try {
+                confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
+                alert("OTP Sent Successfully by Google!");
+                document.getElementById('otp-btn').innerText = 'Get OTP';
+            } catch (error) {
+                console.error("Firebase Error:", error);
+                alert("Error: " + error.message);
+                document.getElementById('otp-btn').innerText = 'Get OTP';
+            }
         }
 
+        // Verify & Register
         async function register() {
             const ans = document.getElementById('cap-ans').value;
-            if(parseInt(ans) !== (n1+n2)) return alert("Wrong Captcha");
+            if(parseInt(ans) !== (n1+n2)) return alert("Wrong Math Captcha");
             
-            const payload = {
-                fullName: document.getElementById('name').value,
-                mobile: document.getElementById('mobile').value,
-                password: document.getElementById('password').value,
-                otp: document.getElementById('otp').value,
-                accountType: document.getElementById('type').value,
-                email: "" 
-            };
+            const otp = document.getElementById('otp').value;
+            if(!otp) return alert("Please enter OTP");
+            if(!confirmationResult) return alert("Please request OTP first!");
 
-            const res = await fetch('/api/register', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            alert(data.message);
-            if(data.success) window.location.href = 'index.html';
+            try {
+                await confirmationResult.confirm(otp);
+                
+                const payload = {
+                    fullName: document.getElementById('name').value,
+                    mobile: document.getElementById('mobile').value,
+                    password: document.getElementById('password').value,
+                    accountType: document.getElementById('type').value
+                };
+
+                const res = await fetch('/api/register', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                alert(data.message);
+                if(data.success) window.location.href = 'index.html';
+
+            } catch (error) {
+                alert("Invalid OTP! गलत OTP");
+            }
         }
     </script>
 </body>

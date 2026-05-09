@@ -6,18 +6,9 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static('./'));
 
-// 🌐 MONGODB CONNECTION WITH ERROR LOGGING
-const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Mohitbhai0580:Mohit%400580@cluster0.854fydd.mongodb.net/mtef_db?retryWrites=true&w=majority';
+const mongoURI = process.env.MONGODB_URI;
+mongoose.connect(mongoURI).then(() => console.log('✅ Connected to MongoDB')).catch(e => console.log(e));
 
-mongoose.connect(mongoURI, { 
-    serverSelectionTimeoutMS: 5000 // Agar 5 sec mein na jude toh error de
-}).then(() => {
-    console.log('✅ MongoDB Connected Successfully!');
-}).catch(err => {
-    console.log('❌ MongoDB Connection Error:', err.message);
-});
-
-// 📁 MODELS
 const UserSchema = new mongoose.Schema({
     fullName: String, email: String, mobile: String, password: String, accountType: String,
     bankDetails: { bankName: String, accHolder: String, accNumber: String, ifsc: String }
@@ -25,60 +16,38 @@ const UserSchema = new mongoose.Schema({
 const Customer = mongoose.model('Customer', UserSchema, 'customers');
 const Agent = mongoose.model('Agent', UserSchema, 'agents');
 
-let tempOTPs = {}; 
-
-// 📱 OTP API
-app.post('/api/send-otp', async (req, res) => {
-    const { mobile } = req.body; 
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    tempOTPs[mobile] = otp; 
-    try {
-        const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-            method: 'POST',
-            headers: { 'authorization': process.env.FAST2SMS_API_KEY, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ route: 'q', message: `MTEF OTP is: ${otp}`, numbers: mobile })
-        });
-        const data = await response.json();
-        res.json({ success: data.return, message: data.return ? "OTP Sent!" : "SMS Error" });
-    } catch (e) { res.json({ success: false, message: "Server Error" }); }
-});
-
-// 📝 REGISTRATION API
 app.post('/api/register', async (req, res) => {
     try {
-        const { fullName, email, mobile, password, accountType, otp } = req.body;
-        if (tempOTPs[mobile] != otp) return res.json({ success: false, message: 'Invalid OTP!' });
-        
+        const { fullName, email, mobile, password, accountType } = req.body;
         const Model = accountType === 'Agent' ? Agent : Customer;
-        await new Model({ fullName, email, mobile, password, accountType }).save();
-        
-        delete tempOTPs[mobile];
-        res.json({ success: true, message: 'Account Created Successfully!' });
+        await new Model({ fullName, email: email || "", mobile, password, accountType }).save();
+        res.json({ success: true, message: 'Registration Successful! Data Saved.' });
     } catch (err) {
-        console.log("Registration Error:", err.message);
         res.json({ success: false, message: "Database Error: " + err.message });
     }
 });
 
-// 🔐 LOGIN API
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    if (email === "mohitkumarolanda@gmail.com" && password === "Mohit@Admin786") return res.json({ success: true, redirectUrl: 'admin.html' });
+    if (email === "mohitkumarolanda@gmail.com" && password === "Mohit@Admin786") return res.json({ success: true, redirectUrl: 'admin_dashboard.html' });
     const agent = await Agent.findOne({ $or: [{email}, {mobile: email}], password });
     const customer = await Customer.findOne({ $or: [{email}, {mobile: email}], password });
     if (agent) return res.json({ success: true, redirectUrl: 'agent.html' });
     if (customer) return res.json({ success: true, redirectUrl: 'customer.html' });
-    res.json({ success: false, message: 'Login Failed!' });
+    res.json({ success: false, message: 'Invalid Credentials!' });
 });
 
-// 🏦 ADD BANK API
+app.get('/api/admin/all-data', async (req, res) => {
+    const agents = await Agent.find({});
+    const customers = await Customer.find({});
+    res.json({ agents, customers });
+});
+
 app.post('/api/add-bank', async (req, res) => {
     const { email, bankName, accHolder, accNumber, ifsc } = req.body;
-    try {
-        await Agent.findOneAndUpdate({ $or: [{email}, {mobile: email}] }, { bankDetails: { bankName, accHolder, accNumber, ifsc } });
-        res.json({ success: true, message: "Bank Account Added Successfully!" });
-    } catch (e) { res.json({ success: false, message: "Database Error" }); }
+    await Agent.findOneAndUpdate({ $or: [{email}, {mobile: email}] }, { bankDetails: { bankName, accHolder, accNumber, ifsc } });
+    res.json({ success: true, message: "Bank Details Updated!" });
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
