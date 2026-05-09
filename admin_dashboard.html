@@ -3,190 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTEF Admin - Boss Panel</title>
+    <title>Super Admin - MTEF</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Inter', sans-serif; padding-bottom: 20px; }
+        body { margin: 0; padding: 0; background-color: #0b0f19; color: #ffffff; font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background-color: #0b0f19; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1a2235; }
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .avatar { width: 50px; height: 50px; border-radius: 12px; background-color: #e74c3c; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; color: #fff; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3); }
-        .admin-info h2 { margin: 0; font-size: 20px; font-weight: 700; color: #fff; }
-        .admin-info p { margin: 2px 0 0 0; font-size: 11px; color: #e74c3c; letter-spacing: 1px; text-transform: uppercase; font-weight: bold; }
-        .logout-btn { background-color: #1a2235; color: #e74c3c; border: 1px solid #e74c3c; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-
-        /* Stats Cards */
-        .stats-container { display: flex; gap: 15px; padding: 20px; }
-        .stat-card { flex: 1; background-color: #121826; border-radius: 16px; padding: 20px; border: 1px solid #1e293b; text-align: center; }
-        .stat-card.agents { border-bottom: 4px solid #f5b041; }
-        .stat-card.customers { border-bottom: 4px solid #3498db; }
-        .stat-card i { font-size: 24px; margin-bottom: 10px; }
-        .stat-card.agents i { color: #f5b041; }
-        .stat-card.customers i { color: #3498db; }
-        .stat-value { font-size: 32px; font-weight: 700; margin: 0; }
-        .stat-title { font-size: 12px; color: #94a3b8; text-transform: uppercase; margin-top: 5px; }
-
-        /* Tabs */
-        .tab-container { display: flex; padding: 0 20px; gap: 10px; margin-bottom: 15px; }
-        .tab { flex: 1; padding: 12px; text-align: center; background-color: #1a2235; color: #64748b; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; border: 1px solid transparent; }
-        .tab.active { background-color: #2563eb; color: #fff; border-color: #3b82f6; }
-
-        /* User Lists */
-        .list-section { display: none; padding: 0 20px; }
-        .list-section.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .user-card { background-color: #121826; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1e293b; position: relative; }
-        .user-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
-        .user-icon { width: 40px; height: 40px; border-radius: 50%; background-color: #1a2235; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 18px; }
-        .user-name { font-weight: 600; font-size: 16px; margin: 0; color: #fff; }
-        .user-date { font-size: 11px; color: #64748b; margin: 0; }
+        /* Sidebar */
+        .sidebar { width: 250px; background-color: #121826; border-right: 1px solid #1e293b; display: flex; flex-direction: column; transition: 0.3s; z-index: 100; }
+        .logo-area { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1e293b; }
+        .logo-icon { background-color: #f5b041; color: #000; padding: 8px 10px; border-radius: 8px; font-weight: bold; font-size: 18px; }
+        .logo-text h2 { margin: 0; font-size: 18px; letter-spacing: 1px; }
+        .logo-text p { margin: 0; font-size: 10px; color: #64748b; letter-spacing: 2px; }
         
-        .user-detail { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; color: #cbd5e1; }
-        .user-detail i { color: #3498db; width: 15px; text-align: center; }
+        .nav-menu { padding: 15px 0; flex-grow: 1; overflow-y: auto; }
+        .nav-item { padding: 12px 20px; display: flex; align-items: center; gap: 15px; color: #94a3b8; cursor: pointer; transition: 0.2s; font-size: 14px; font-weight: 500; }
+        .nav-item:hover { color: #fff; background-color: rgba(255,255,255,0.05); }
+        .nav-item.active { color: #f5b041; border-left: 3px solid #f5b041; background-color: rgba(245, 176, 65, 0.1); }
+        .nav-item i { font-size: 16px; width: 20px; text-align: center; }
         
-        .bank-box { margin-top: 15px; padding: 12px; background-color: rgba(46, 204, 113, 0.05); border: 1px dashed #2ecc71; border-radius: 8px; }
-        .bank-title { font-size: 11px; color: #2ecc71; text-transform: uppercase; font-weight: 700; margin: 0 0 8px 0; }
-        .bank-detail { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; color: #94a3b8; }
-        .bank-detail span { color: #fff; font-weight: 500; }
-        .no-bank { color: #e74c3c; font-size: 12px; font-style: italic; }
+        /* Main Content */
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; background-color: #0b0f19; }
+        
+        /* Topbar */
+        .topbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: #121826; border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 50; }
+        .top-title { font-size: 18px; font-weight: 600; }
+        .admin-profile { display: flex; align-items: center; gap: 12px; }
+        .admin-info { text-align: right; }
+        .admin-info h4 { margin: 0; font-size: 14px; }
+        .admin-info p { margin: 0; font-size: 10px; color: #64748b; }
+        .admin-avatar { background-color: #f5b041; color: #000; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; }
 
+        /* Pages */
+        .page { display: none; padding: 30px; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Dashboard Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background-color: #121826; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; border-left: 4px solid; }
+        .stat-card h3 { margin: 0 0 10px 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card h2 { margin: 0; font-size: 28px; font-weight: 700; }
+        
+        .border-blue { border-left-color: #3b82f6; }
+        .border-purple { border-left-color: #8b5cf6; }
+        .border-green { border-left-color: #10b981; }
+        .border-red { border-left-color: #ef4444; }
+
+        /* Tables & Lists */
+        .card-panel { background-color: #121826; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        .panel-header h3 { margin: 0; font-size: 15px; color: #fff; }
+        
+        .data-list { display: flex; flex-direction: column; gap: 15px; }
+        .data-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #1a2235; border-radius: 8px; border: 1px solid #2a354f; flex-wrap: wrap; gap: 10px; }
+        .data-info { display: flex; align-items: center; gap: 15px; }
+        .data-icon { width: 40px; height: 40px; border-radius: 50%; background-color: #2a354f; display: flex; justify-content: center; align-items: center; color: #94a3b8; }
+        .data-text h4 { margin: 0; font-size: 15px; }
+        .data-text p { margin: 2px 0 0 0; font-size: 12px; color: #94a3b8; }
+        
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-green { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .badge-red { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .badge-yellow { background-color: rgba(245, 176, 65, 0.1); color: #f5b041; }
+        
+        .btn { padding: 8px 15px; border-radius: 6px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .btn-green { background-color: #10b981; color: white; }
+        .btn-red { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
+
+        /* Bank Details Box */
+        .bank-box { width: 100%; margin-top: 10px; padding: 15px; background-color: rgba(59, 130, 246, 0.05); border: 1px dashed #3b82f6; border-radius: 8px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .bank-item { flex: 1; min-width: 120px; }
+        .bank-item label { display: block; font-size: 10px; color: #3b82f6; text-transform: uppercase; margin-bottom: 3px; font-weight: bold; }
+        .bank-item span { font-size: 13px; color: #fff; }
+
+        /* Mobile Toggle */
+        .menu-toggle { display: none; font-size: 20px; cursor: pointer; color: #fff; margin-right: 15px; }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: 100%; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .menu-toggle { display: block; }
+            .topbar { padding: 15px; }
+            .page { padding: 15px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="header-left">
-            <div class="avatar"><i class="fa-solid fa-crown"></i></div>
-            <div class="admin-info">
-                <h2>Mohit Sir</h2>
-                <p>MTEF Admin</p>
+    <div class="sidebar" id="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fa-solid fa-building"></i></div>
+            <div class="logo-text">
+                <h2>MTEF</h2>
+                <p>MASTER TECH EDU</p>
             </div>
         </div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
-
-    <div class="stats-container">
-        <div class="stat-card agents">
-            <i class="fa-solid fa-user-tie"></i>
-            <div class="stat-value" id="total-agents">0</div>
-            <div class="stat-title">Total Agents</div>
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="switchPage('dashboard', 'Dashboard Overview')" id="nav-dashboard">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </div>
+            <div class="nav-item" onclick="switchPage('leads', 'Client Leads Management')" id="nav-leads">
+                <i class="fa-solid fa-filter"></i> Client Leads
+            </div>
+            <div class="nav-item" onclick="switchPage('agents', 'Agent Intelligence & Details')" id="nav-agents">
+                <i class="fa-solid fa-user-tie"></i> Agent Mgmt
+            </div>
+            <div class="nav-item" onclick="switchPage('customers', 'Customer Direct Portal')" id="nav-customers">
+                <i class="fa-solid fa-users"></i> Customer Mgmt
+            </div>
+            <div class="nav-item" onclick="switchPage('payments', 'Financial Ledger & Sync')" id="nav-payments">
+                <i class="fa-solid fa-wallet"></i> Payments <span style="background: #ef4444; color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; margin-left: auto;">0</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('roles', 'Security & Roles Management')" id="nav-roles">
+                <i class="fa-solid fa-shield-halved"></i> Roles & Security
+            </div>
         </div>
-        <div class="stat-card customers">
-            <i class="fa-solid fa-users"></i>
-            <div class="stat-value" id="total-customers">0</div>
-            <div class="stat-title">Total Customers</div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-bars menu-toggle" onclick="toggleMenu()"></i>
+                <div class="top-title" id="top-title">Dashboard Overview</div>
+            </div>
+            <div class="admin-profile">
+                <div class="admin-info">
+                    <h4>Mohit Kumar</h4>
+                    <p>DIRECTOR / SUPER ADMIN</p>
+                </div>
+                <div class="admin-avatar" onclick="logout()" title="Click to Logout">MK</div>
+            </div>
         </div>
-    </div>
 
-    <div class="tab-container">
-        <div class="tab active" onclick="switchTab('agents')" id="tab-agents">Agents List</div>
-        <div class="tab" onclick="switchTab('customers')" id="tab-customers">Customers List</div>
-    </div>
+        <div id="page-dashboard" class="page active">
+            <div class="stats-grid">
+                <div class="stat-card border-blue">
+                    <h3>Total Agents</h3>
+                    <h2 id="dash-agents">0</h2>
+                </div>
+                <div class="stat-card border-purple">
+                    <h3>Total Customers</h3>
+                    <h2 id="dash-customers">0</h2>
+                </div>
+                <div class="stat-card border-green">
+                    <h3>Total Earnings</h3>
+                    <h2>₹0</h2>
+                </div>
+                <div class="stat-card border-red">
+                    <h3>Pending Withdrawals</h3>
+                    <h2>0</h2>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div class="card-panel" style="flex: 1; min-width: 300px; height: 200px; display: flex; justify-content: center; align-items: center; color: #3b82f6;">
+                    <i class="fa-solid fa-chart-line" style="font-size: 50px; opacity: 0.5;"></i>
+                    <span style="margin-left: 15px; color: #64748b;">Growth Chart</span>
+                </div>
+                <div class="card-panel" style="flex: 1; min-width: 300px; height: 200px; display: flex; justify-content: center; align-items: center; color: #8b5cf6;">
+                    <i class="fa-solid fa-chart-simple" style="font-size: 50px; opacity: 0.5;"></i>
+                    <span style="margin-left: 15px; color: #64748b;">Performance Analytics</span>
+                </div>
+            </div>
+        </div>
 
-    <div id="section-agents" class="list-section active">
-        <p style="text-align: center; color: #64748b;">Loading Agents...</p>
-    </div>
+        <div id="page-leads" class="page">
+            <div class="card-panel">
+                <div class="panel-header">
+                    <input type="text" placeholder="Search leads by name or phone" style="background: #0b0f19; border: 1px solid #1e293b; padding: 10px 15px; border-radius: 8px; color: white; width: 300px;">
+                    <button class="btn" style="background: #f5b041; color: black;"><i class="fa-solid fa-plus"></i> Add New Lead</button>
+                </div>
+                <div class="data-list">
+                    <div class="data-row">
+                        <div class="data-info">
+                            <div class="data-text">
+                                <h4>Ravi Verma</h4>
+                                <p>+91 8876543210</p>
+                            </div>
+                        </div>
+                        <div class="badge" style="background: #1e293b; color: #3b82f6;">Facebook Ads</div>
+                        <div style="color: #f5b041; font-size: 13px;">Unassigned</div>
+                        <div class="badge badge-red">New</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div id="section-customers" class="list-section">
-        <p style="text-align: center; color: #64748b;">Loading Customers...</p>
+        <div id="page-agents" class="page">
+            
+            <h4 style="color: #f5b041; margin-top: 0;"><i class="fa-solid fa-money-bill-transfer"></i> PENDING WITHDRAW REQUESTS</h4>
+            <div class="card-panel" style="border-left: 4px solid #f5b041;">
+                <div class="data-row" style="background: transparent; border: none; padding: 0;">
+                    <div class="data-info">
+                        <div class="data-icon"><i class="fa-solid fa-user"></i></div>
+                        <div class="data-text">
+                            <h4>Suresh Kumar</h4>
+                            <p>Withdrawal Request</p>
+                        </div>
+                    </div>
+                    <h3 style="color: #10b981; margin: 0;">₹4,500</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-green">Approve</button>
+                        <button class="btn btn-red">Reject</button>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="color: #3b82f6;"><i class="fa-solid fa-list-check"></i> ALL REGISTERED AGENTS & BANK DETAILS</h4>
+            <div class="card-panel">
+                <div class="data-list" id="agents-list">
+                    <p style="color: #64748b; text-align: center;">Loading agents data...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-customers" class="page">
+            <div class="card-panel">
+                <div class="panel-header"><h3><i class="fa-solid fa-users"></i> ALL REGISTERED CUSTOMERS</h3></div>
+                <div class="data-list" id="customers-list">
+                    <p style="color: #64748b; text-align: center;">Loading customers data...</p>
+                </div>
+            </div>
+
+            <div class="card-panel">
+                <div class="panel-header"><h3><i class="fa-solid fa-comment-dots"></i> DIRECT MESSAGING</h3></div>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <input type="text" placeholder="Message Title" style="background: #0b0f19; border: 1px solid #1e293b; padding: 15px; border-radius: 8px; color: white; flex: 1;">
+                    <textarea placeholder="Type message..." style="background: #0b0f19; border: 1px solid #1e293b; padding: 15px; border-radius: 8px; color: white; flex: 2; height: 50px; font-family: inherit;"></textarea>
+                    <button class="btn" style="background: #f5b041; color: black; font-size: 16px; padding: 0 30px;"><i class="fa-solid fa-paper-plane"></i> Send</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-payments" class="page">
+            <div class="card-panel">
+                <div class="panel-header"><h3><i class="fa-solid fa-file-invoice-dollar"></i> Financial Ledger</h3></div>
+                <div class="data-list">
+                    <div class="data-row">
+                        <div style="font-size: 13px; color: #94a3b8;">06 May 2026</div>
+                        <div style="font-weight: bold;">AGT-001</div>
+                        <div style="color: #ef4444; font-weight: bold;">-₹4,500</div>
+                        <div class="badge badge-green">Approved</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-roles" class="page">
+            <div class="card-panel">
+                <div class="panel-header">
+                    <div>
+                        <h3><i class="fa-solid fa-user-shield"></i> Sub-Admin Role Management</h3>
+                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #64748b;">Create limited-access accounts for your team.</p>
+                    </div>
+                    <button class="btn" style="background: #3b82f6; color: white;" onclick="addSubAdmin()"><i class="fa-solid fa-plus"></i> Add Sub-Admin</button>
+                </div>
+                <div class="data-list" id="subadmin-list">
+                    <p id="empty-roles-msg" style="text-align: center; color: #64748b; font-style: italic; margin: 20px 0;">No Sub-Admins added yet. Click 'Add Sub-Admin' to create one.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // Check if admin is logged in (Security Check)
-        if(localStorage.getItem('isAdmin') !== 'true') {
-            window.location.href = "index.html";
+        // Security Check
+        if(localStorage.getItem('isAdmin') !== 'true') { window.location.href = "index.html"; }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
-        // Tab Switching Logic
-        function switchTab(tab) {
-            document.getElementById('tab-agents').classList.remove('active');
-            document.getElementById('tab-customers').classList.remove('active');
-            document.getElementById('section-agents').classList.remove('active');
-            document.getElementById('section-customers').classList.remove('active');
-
-            document.getElementById('tab-' + tab).classList.add('active');
-            document.getElementById('section-' + tab).classList.add('active');
+        function switchPage(pageId, title) {
+            document.getElementById('top-title').innerText = title;
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.getElementById('nav-' + pageId).classList.add('active');
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
         }
 
-        // Fetch and Render Data from Database
+        // Add Sub Admin Functionality
+        function addSubAdmin() {
+            const name = prompt("Enter new Sub-Admin Name:");
+            if(name && name.trim() !== "") {
+                const list = document.getElementById('subadmin-list');
+                const emptyMsg = document.getElementById('empty-roles-msg');
+                if(emptyMsg) emptyMsg.style.display = 'none'; // Hide empty message
+
+                list.innerHTML += `
+                <div class="data-row">
+                    <div class="data-info">
+                        <div class="data-text">
+                            <h4>${name}</h4>
+                            <p>${name.toLowerCase().replace(/\s+/g, '')}@mtef.com</p>
+                        </div>
+                    </div>
+                    <div class="badge" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">Assigned Admin</div>
+                    <div class="badge badge-green">Active</div>
+                    <button class="btn btn-red" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i> Revoke</button>
+                </div>`;
+            }
+        }
+
         async function loadAdminData() {
             try {
                 const response = await fetch('/api/admin/all-data');
                 const data = await response.json();
 
-                // Update Stats
-                document.getElementById('total-agents').innerText = data.agents.length;
-                document.getElementById('total-customers').innerText = data.customers.length;
+                document.getElementById('dash-agents').innerText = data.agents.length;
+                document.getElementById('dash-customers').innerText = data.customers.length;
 
-                // Render Agents
-                const agentsDiv = document.getElementById('section-agents');
-                agentsDiv.innerHTML = '';
-                if(data.agents.length === 0) agentsDiv.innerHTML = '<p style="text-align:center; color:#64748b;">No Agents Registered Yet.</p>';
+                const agentsList = document.getElementById('agents-list');
+                agentsList.innerHTML = '';
+                if(data.agents.length === 0) agentsList.innerHTML = '<p style="text-align:center; color:#64748b;">No agents found.</p>';
                 
                 data.agents.forEach(agent => {
-                    let bankHTML = '<div class="no-bank">Bank Details not updated yet.</div>';
+                    let bankInfo = `<div style="width: 100%; text-align: center; font-size: 12px; color: #ef4444; margin-top: 10px;">⚠️ Bank Details Not Submitted Yet</div>`;
+                    
                     if(agent.bankDetails && agent.bankDetails.accNumber) {
-                        bankHTML = `
-                            <div class="bank-box">
-                                <p class="bank-title"><i class="fa-solid fa-building-columns"></i> Verified Bank</p>
-                                <div class="bank-detail">Bank Name: <span>${agent.bankDetails.bankName}</span></div>
-                                <div class="bank-detail">A/c Holder: <span>${agent.bankDetails.accHolder}</span></div>
-                                <div class="bank-detail">Account No: <span>${agent.bankDetails.accNumber}</span></div>
-                                <div class="bank-detail">IFSC: <span>${agent.bankDetails.ifsc}</span></div>
-                            </div>
-                        `;
+                        bankInfo = `
+                        <div class="bank-box">
+                            <div class="bank-item"><label>Bank Name</label><span>${agent.bankDetails.bankName}</span></div>
+                            <div class="bank-item"><label>A/C Holder</label><span>${agent.bankDetails.accHolder}</span></div>
+                            <div class="bank-item"><label>Account No</label><span>${agent.bankDetails.accNumber}</span></div>
+                            <div class="bank-item"><label>IFSC Code</label><span>${agent.bankDetails.ifsc}</span></div>
+                        </div>`;
                     }
 
-                    agentsDiv.innerHTML += `
-                        <div class="user-card">
-                            <div class="user-header">
-                                <div class="user-icon"><i class="fa-solid fa-user-tie"></i></div>
-                                <div>
-                                    <h3 class="user-name">${agent.fullName}</h3>
-                                    <p class="user-date">Agent Partner</p>
+                    agentsList.innerHTML += `
+                    <div class="data-row" style="flex-direction: column; align-items: stretch;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 10px;">
+                            <div class="data-info">
+                                <div class="data-icon"><i class="fa-solid fa-user-tie"></i></div>
+                                <div class="data-text">
+                                    <h4>${agent.fullName}</h4>
+                                    <p><i class="fa-solid fa-phone"></i> +91 ${agent.mobile}</p>
                                 </div>
                             </div>
-                            <div class="user-detail"><i class="fa-solid fa-phone"></i> +91 ${agent.mobile}</div>
-                            ${bankHTML}
+                            <div style="font-weight: bold; color: #10b981;">Earnings: ₹0</div>
+                            <div class="badge badge-green">Active</div>
                         </div>
-                    `;
+                        ${bankInfo}
+                    </div>`;
                 });
 
-                // Render Customers
-                const customersDiv = document.getElementById('section-customers');
-                customersDiv.innerHTML = '';
-                if(data.customers.length === 0) customersDiv.innerHTML = '<p style="text-align:center; color:#64748b;">No Customers Registered Yet.</p>';
+                const customersList = document.getElementById('customers-list');
+                customersList.innerHTML = '';
+                if(data.customers.length === 0) customersList.innerHTML = '<p style="text-align:center; color:#64748b;">No customers found.</p>';
 
                 data.customers.forEach(customer => {
-                    customersDiv.innerHTML += `
-                        <div class="user-card" style="border-color: #3498db;">
-                            <div class="user-header">
-                                <div class="user-icon" style="background-color: rgba(52,152,219,0.1); color: #3498db;"><i class="fa-solid fa-user"></i></div>
-                                <div>
-                                    <h3 class="user-name">${customer.fullName}</h3>
-                                    <p class="user-date">Direct Customer</p>
-                                </div>
+                    customersList.innerHTML += `
+                    <div class="data-row">
+                        <div class="data-info">
+                            <div class="data-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="fa-solid fa-user"></i></div>
+                            <div class="data-text">
+                                <h4>${customer.fullName}</h4>
+                                <p>+91 ${customer.mobile}</p>
                             </div>
-                            <div class="user-detail"><i class="fa-solid fa-phone"></i> +91 ${customer.mobile}</div>
                         </div>
-                    `;
+                        <div style="font-size: 13px; color: #f5b041;">Direct Lead</div>
+                        <div class="badge badge-green">Active</div>
+                    </div>`;
                 });
 
-            } catch (error) {
-                console.error("Error loading data", error);
-            }
+            } catch (error) { console.error("Data Load Error:", error); }
         }
 
         function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
+            if(confirm("Logout from Admin Panel?")) {
+                localStorage.clear();
+                window.location.href = "index.html";
+            }
         }
 
-        // Load data on startup
         loadAdminData();
     </script>
 </body>
